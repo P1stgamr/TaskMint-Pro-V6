@@ -11,17 +11,15 @@
 </head>
 <body>
 
-<!-- ===== AUTH PAGE ===== -->
+<!-- AUTH PAGE -->
 <div id="page-auth" class="page-section">
   <div class="auth-bg">
     <div class="auth-container">
       <div class="auth-logo">
         <i class="fas fa-gem"></i>
         <h1 class="text-gradient">TaskMint Pro</h1>
-        <p style="color:#aaa;font-size:0.85rem;">Earn Real Money with Tasks</p>
+        <p style="color:#aaa;font-size:0.85rem;">Earn Real Money with Tasks & Videos</p>
       </div>
-
-      <!-- LOGIN FORM -->
       <div id="form-login" class="glass">
         <h3 class="mb-10">Login to Account</h3>
         <div class="input-group">
@@ -35,14 +33,12 @@
         <button class="btn" onclick="Auth.login()">LOGIN</button>
         <p class="auth-switch" onclick="UI.toggleAuth('register')">Don't have an account? <b>Sign Up</b></p>
       </div>
-
-      <!-- REGISTER FORM -->
       <div id="form-register" class="glass hidden">
         <h3 class="mb-10">Create Account</h3>
         <div class="input-group" style="position:relative;">
           <i class="fas fa-user"></i>
           <input type="text" id="rUser" placeholder="Username (min 3 chars)" oninput="Auth.checkUsername(this.value)">
-          <span id="usernameStatus" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:0.8rem;"></span>
+          <span id="usernameStatus" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:0.8rem;font-weight:bold;pointer-events:none;"></span>
         </div>
         <div class="input-group">
           <i class="fas fa-phone"></i>
@@ -61,8 +57,6 @@
       </div>
     </div>
   </div>
-
-  <!-- Admin Trigger -->
   <div style="position:fixed;bottom:20px;right:20px;opacity:0.2;font-size:24px;cursor:pointer;" onclick="document.getElementById('admin-gate').classList.toggle('hidden')">🔒</div>
   <div id="admin-gate" class="glass hidden" style="position:fixed;bottom:60px;right:15px;width:240px;border:1px solid var(--neon-gold);">
     <h4 style="color:gold;text-align:center;margin-bottom:10px;">Admin Access</h4>
@@ -71,7 +65,7 @@
   </div>
 </div>
 
-<!-- ===== HOME PAGE ===== -->
+<!-- HOME PAGE -->
 <div id="page-home" class="page-section hidden">
   <div class="profile-header">
     <img src="" class="avatar-sm u-avatar" style="cursor:pointer;" onclick="Router.go('profile')">
@@ -92,6 +86,7 @@
       <button class="btn btn-sm btn-outline" onclick="Router.go('referral')"><i class="fas fa-users"></i> Invite</button>
     </div>
   </div>
+  <!-- AD BANNER -->
   <div style="padding:0 15px;">
     <p class="section-label">SPONSORED</p>
     <div id="homeAdContainer" class="glass ad-container"></div>
@@ -102,7 +97,7 @@
   </div>
 </div>
 
-<!-- ===== GAMES PAGE ===== -->
+<!-- GAMES PAGE -->
 <div id="page-games" class="page-section hidden">
   <div style="padding:20px 20px 10px;">
     <h2 class="text-gradient"><i class="fas fa-gamepad"></i> Arcade Zone</h2>
@@ -139,7 +134,7 @@
   <div style="height:100px;"></div>
 </div>
 
-<!-- ===== REFERRAL PAGE ===== -->
+<!-- REFERRAL PAGE -->
 <div id="page-referral" class="page-section hidden">
   <div style="padding:20px 20px 10px;">
     <h2 class="text-gradient"><i class="fas fa-users"></i> Refer & Earn</h2>
@@ -163,13 +158,11 @@
   </div>
 </div>
 
-<!-- ===== PROFILE PAGE ===== -->
+<!-- PROFILE PAGE -->
 <div id="page-profile" class="page-section hidden">
   <div style="padding:20px 20px 10px;">
     <h2 class="text-gradient"><i class="fas fa-user-circle"></i> My Profile</h2>
   </div>
-
-  <!-- Profile Card -->
   <div class="glass" style="text-align:center;padding:20px;">
     <div style="position:relative;display:inline-block;margin-bottom:12px;">
       <img id="profileAvatar" src="" class="avatar-lg u-avatar" style="display:block;">
@@ -187,8 +180,6 @@
       <div><h3 class="u-bal" style="color:var(--neon-cyan);">৳0</h3><small style="color:#aaa;">Balance</small></div>
     </div>
   </div>
-
-  <!-- Avatar presets -->
   <div class="glass">
     <h3 style="margin-bottom:12px;">Preset Avatars</h3>
     <div class="avatar-grid">
@@ -200,41 +191,22 @@
       <img src="https://cdn-icons-png.flaticon.com/512/4140/4140072.png" class="avatar-option" onclick="Profile.setAvatar(this.src)">
     </div>
   </div>
-
-  <!-- Edit Profile -->
   <div class="glass">
     <h3 style="margin-bottom:15px;"><i class="fas fa-edit" style="color:var(--neon-cyan);margin-right:6px;"></i>Edit Profile</h3>
     <label class="form-label">Display Name</label>
-    <div class="input-group">
-      <i class="fas fa-user"></i>
-      <input type="text" id="editDisplayName" placeholder="Your display name">
-    </div>
-    <label class="form-label">New Password <span style="color:#888;font-size:0.8rem;">(leave blank to keep current)</span></label>
-    <div class="input-group">
-      <i class="fas fa-lock"></i>
-      <input type="password" id="editNewPass" placeholder="New password (min 6 chars)">
-    </div>
+    <div class="input-group"><i class="fas fa-user"></i><input type="text" id="editDisplayName" placeholder="Your display name"></div>
+    <label class="form-label">New Password <span style="color:#888;font-size:0.8rem;">(leave blank to keep)</span></label>
+    <div class="input-group"><i class="fas fa-lock"></i><input type="password" id="editNewPass" placeholder="New password (min 6 chars)"></div>
     <label class="form-label">Confirm New Password</label>
-    <div class="input-group">
-      <i class="fas fa-lock"></i>
-      <input type="password" id="editConfirmPass" placeholder="Confirm new password">
-    </div>
-    <label class="form-label">Current Password <span style="color:#f66;font-size:0.8rem;">*required to save changes</span></label>
-    <div class="input-group">
-      <i class="fas fa-key"></i>
-      <input type="password" id="editCurrentPass" placeholder="Enter current password to confirm">
-    </div>
+    <div class="input-group"><i class="fas fa-lock"></i><input type="password" id="editConfirmPass" placeholder="Confirm new password"></div>
+    <label class="form-label">Current Password <span style="color:#f66;font-size:0.8rem;">*required</span></label>
+    <div class="input-group"><i class="fas fa-key"></i><input type="password" id="editCurrentPass" placeholder="Enter current password"></div>
     <button class="btn btn-success" onclick="Profile.saveChanges()"><i class="fas fa-save"></i> Save Changes</button>
   </div>
-
-  <!-- My Channel -->
   <div class="glass">
     <h3 style="margin-bottom:10px;"><i class="fas fa-tv" style="color:var(--neon-gold);margin-right:6px;"></i>My Channel</h3>
-    <p style="color:#aaa;font-size:0.85rem;margin-bottom:12px;">Manage your videos and view your channel page</p>
     <button class="btn btn-outline" onclick="Profile.openMyChannel()"><i class="fas fa-external-link-alt"></i> View My Channel</button>
   </div>
-
-  <!-- Stats -->
   <div class="glass">
     <h3 style="margin-bottom:12px;"><i class="fas fa-chart-bar" style="color:var(--neon-purple);margin-right:6px;"></i>My Stats</h3>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
@@ -244,28 +216,24 @@
       <div class="monetize-stat-box"><i class="fas fa-eye" style="color:#ff6b35;"></i><h3 id="profileViews">0</h3><small>Video Views</small></div>
     </div>
   </div>
-
   <div class="glass">
     <button class="btn btn-danger" onclick="Auth.logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
   </div>
   <div style="height:100px;"></div>
 </div>
 
-<!-- ===== WITHDRAW PAGE ===== -->
+<!-- WITHDRAW PAGE -->
 <div id="page-withdraw" class="page-section hidden">
   <div style="padding:20px 20px 10px;">
     <h2 class="text-gradient"><i class="fas fa-money-bill-wave"></i> Withdraw</h2>
     <p style="color:#aaa;font-size:0.85rem;">Bangladesh Mobile Banking</p>
   </div>
-
-  <!-- Monetize lock notice -->
-  <div id="withdrawLockNotice" class="glass hidden" style="border:1px solid rgba(255,165,0,0.3);text-align:center;padding:20px;">
+  <div id="withdrawLockNotice" class="glass hidden" style="border:1px solid rgba(255,165,0,0.3);text-align:center;padding:20px;margin:0 15px 15px;">
     <i class="fas fa-lock" style="font-size:2.5rem;color:#f59e0b;display:block;margin-bottom:12px;"></i>
     <h3 style="color:#f59e0b;margin-bottom:8px;">Withdrawal Locked</h3>
-    <p style="color:#aaa;font-size:0.85rem;margin-bottom:12px;">You must be <b style="color:var(--neon-gold);">Monetized</b> to withdraw. Reach 1,000,000 coins and apply for monetization.</p>
-    <button class="btn btn-sm" onclick="Router.go('videos');setTimeout(()=>VideoSystem.switchTab('monetize'),300)"><i class="fas fa-rocket"></i> Go to Monetize</button>
+    <p style="color:#aaa;font-size:0.85rem;margin-bottom:12px;">You must be <b style="color:var(--neon-gold);">Monetized</b> to withdraw.</p>
+    <button class="btn btn-sm" onclick="Router.go('videos');setTimeout(()=>VideoSystem.switchTab('monetize'),300)"><i class="fas fa-rocket"></i> Apply for Monetization</button>
   </div>
-
   <div id="withdrawForm">
     <div class="glass" style="text-align:center;">
       <p style="color:#aaa;">Available Balance</p>
@@ -281,49 +249,30 @@
     <div class="glass">
       <h3 style="margin-bottom:15px;"><i class="fas fa-paper-plane" style="color:var(--neon-cyan);margin-right:8px;"></i>New Request</h3>
       <label class="form-label">Payment Method</label>
-      <div class="custom-select-wrapper">
-        <select id="wMethod" class="custom-select">
-          <option value="">-- Select Method --</option>
-        </select>
-      </div>
+      <div class="custom-select-wrapper"><select id="wMethod" class="custom-select"><option value="">-- Select Method --</option></select></div>
       <label class="form-label">Mobile Number</label>
-      <div class="input-group">
-        <i class="fas fa-phone"></i>
-        <input type="tel" id="wNumber" placeholder="01XXXXXXXXX (11 digits)">
-      </div>
+      <div class="input-group"><i class="fas fa-phone"></i><input type="tel" id="wNumber" placeholder="01XXXXXXXXX"></div>
       <label class="form-label">Amount (BDT)</label>
-      <div class="input-group">
-        <i style="font-style:normal;font-weight:bold;">৳</i>
-        <input type="number" id="wAmt" placeholder="Minimum ৳200">
-      </div>
+      <div class="input-group"><i style="font-style:normal;font-weight:bold;">৳</i><input type="number" id="wAmt" placeholder="Minimum ৳200"></div>
       <div class="withdraw-info-box">
         <i class="fas fa-info-circle"></i>
-        <span>Processing time: 24-48 hours. Equivalent coins will also be deducted.</span>
+        <span>Processing: 24-48 hours. Coins will also be deducted.</span>
       </div>
-      <button class="btn btn-success" onclick="UI.requestWithdraw()">
-        <i class="fas fa-paper-plane"></i> Submit Request
-      </button>
+      <button class="btn btn-success" onclick="UI.requestWithdraw()"><i class="fas fa-paper-plane"></i> Submit Request</button>
     </div>
   </div>
-
   <div style="padding:0 15px 100px 15px;">
     <h3 style="margin-bottom:10px;"><i class="fas fa-history" style="color:var(--neon-cyan);margin-right:8px;"></i>Withdrawal History</h3>
     <div id="withdrawList"></div>
   </div>
 </div>
 
-<!-- ===== ADMIN PAGE ===== -->
+<!-- ADMIN PAGE -->
 <div id="page-admin" class="page-section hidden admin-page">
   <div class="admin-header">
-    <div>
-      <h2 style="color:white;"><i class="fas fa-shield-alt"></i> Admin Panel</h2>
-      <small style="color:rgba(255,255,255,0.6);">TaskMint Pro Management</small>
-    </div>
-    <button class="btn-sm admin-exit-btn" onclick="sessionStorage.removeItem('isAdmin'); Router.go('home')">
-      <i class="fas fa-sign-out-alt"></i> Exit
-    </button>
+    <div><h2 style="color:white;"><i class="fas fa-shield-alt"></i> Admin Panel</h2><small style="color:rgba(255,255,255,0.6);">TaskMint Pro</small></div>
+    <button class="btn-sm admin-exit-btn" onclick="sessionStorage.removeItem('isAdmin'); Router.go('home')"><i class="fas fa-sign-out-alt"></i> Exit</button>
   </div>
-
   <div class="admin-tabs">
     <button id="tab-btn-overview"    class="admin-tab-btn active" onclick="Admin.renderTab('overview')"><i class="fas fa-chart-bar"></i> Overview</button>
     <button id="tab-btn-withdrawals" class="admin-tab-btn" onclick="Admin.renderTab('withdrawals');Admin.renderWithdrawals('all')"><i class="fas fa-money-bill"></i> Withdrawals</button>
@@ -334,7 +283,6 @@
     <button id="tab-btn-config"      class="admin-tab-btn" onclick="Admin.renderTab('config')"><i class="fas fa-cog"></i> Config</button>
   </div>
 
-  <!-- OVERVIEW -->
   <div id="tab-overview" class="admin-tab-content">
     <div class="admin-stats-grid">
       <div class="admin-stat-card"><i class="fas fa-users"></i><h2 id="admTotalUsers">0</h2><p>Total Users</p></div>
@@ -345,16 +293,14 @@
       <div class="admin-stat-card"><i class="fas fa-user-plus"></i><h2 id="admNewToday">0</h2><p>New Today</p></div>
     </div>
     <div class="glass" style="text-align:center;">
-      <p style="color:#aaa;margin-bottom:10px;">Quick Actions</p>
       <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
-        <button class="btn btn-sm" onclick="Admin.renderTab('withdrawals');Admin.renderWithdrawals('Pending')"><i class="fas fa-clock"></i> Pending Withdrawals</button>
+        <button class="btn btn-sm" onclick="Admin.renderTab('withdrawals');Admin.renderWithdrawals('Pending')"><i class="fas fa-clock"></i> Pending</button>
         <button class="btn btn-sm btn-outline" onclick="Admin.exportUsers()"><i class="fas fa-download"></i> Export CSV</button>
-        <button class="btn btn-sm btn-danger" onclick="Admin.clearAllData()"><i class="fas fa-trash"></i> Reset All Data</button>
+        <button class="btn btn-sm btn-danger" onclick="Admin.clearAllData()"><i class="fas fa-trash"></i> Reset Data</button>
       </div>
     </div>
   </div>
 
-  <!-- WITHDRAWALS -->
   <div id="tab-withdrawals" class="admin-tab-content hidden">
     <div class="glass">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
@@ -370,7 +316,6 @@
     </div>
   </div>
 
-  <!-- USERS -->
   <div id="tab-users" class="admin-tab-content hidden">
     <div class="glass">
       <h3 style="margin-bottom:12px;"><i class="fas fa-users" style="color:var(--neon-cyan);margin-right:6px;"></i>User Management</h3>
@@ -382,7 +327,6 @@
     </div>
   </div>
 
-  <!-- TASKS -->
   <div id="tab-tasks" class="admin-tab-content hidden">
     <div class="glass">
       <h3 style="margin-bottom:15px;"><i class="fas fa-plus-circle" style="color:var(--success);margin-right:6px;"></i>Add New Task</h3>
@@ -393,96 +337,76 @@
       <button class="btn btn-success" onclick="Admin.addTask()"><i class="fas fa-plus"></i> Add Task</button>
     </div>
     <div class="glass">
-      <h3 style="margin-bottom:12px;"><i class="fas fa-list" style="color:var(--neon-cyan);margin-right:6px;"></i>Active Tasks</h3>
+      <h3 style="margin-bottom:12px;">Active Tasks</h3>
       <div id="admTaskList"></div>
     </div>
   </div>
 
-  <!-- VIDEOS -->
   <div id="tab-videos" class="admin-tab-content hidden">
-
-    <!-- Global Video Ad Settings -->
+    <!-- AD SETTINGS -->
     <div class="glass">
-      <h3 style="margin-bottom:15px;"><i class="fas fa-ad" style="color:#ff9900;margin-right:6px;"></i>Global Video Ad System</h3>
-      <p style="color:#aaa;font-size:0.82rem;margin-bottom:12px;">Ads play automatically in all videos. Paste one ad link/code — it runs everywhere.</p>
-
+      <h3 style="margin-bottom:12px;"><i class="fas fa-ad" style="color:#ff9900;margin-right:6px;"></i>Video Ad Settings</h3>
       <div class="toggle-row" style="margin-bottom:12px;">
-        <div><b>Enable Ads on All Videos</b><small style="color:#aaa;display:block;">One ad plays before every video</small></div>
+        <div><b>Enable Ads on All Videos</b><small style="color:#aaa;display:block;">Runs on every video automatically</small></div>
         <label class="toggle-switch"><input type="checkbox" id="admVideoAdEnabled"><span class="toggle-slider"></span></label>
       </div>
-
-      <label class="form-label">Ad HTML / Script Code</label>
-      <textarea id="admVideoAdCode" style="width:100%;height:100px;background:#1a1a2e;color:lime;border:1px solid #333;border-radius:10px;padding:10px;font-size:0.8rem;margin-bottom:10px;" placeholder="Paste your ad HTML, AdSense code, image banner, or script here..."></textarea>
-
+      <label class="form-label">Ad HTML / Script Code (Adsterra, AdSense, etc.)</label>
+      <textarea id="admVideoAdCode" style="width:100%;height:120px;background:#1a1a2e;color:lime;border:1px solid #333;border-radius:10px;padding:10px;font-size:0.8rem;margin-bottom:10px;" placeholder="Paste Adsterra or any ad code here..."></textarea>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+        <div><label class="form-label">⚡ Shorts Ad Interval (sec)</label><input type="number" id="admShortsAdInterval" placeholder="60"></div>
+        <div><label class="form-label">🎬 Long Video Ad Interval (sec)</label><input type="number" id="admLongAdInterval" placeholder="300"></div>
+      </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
-        <div>
-          <label class="form-label">⚡ Shorts Ad Interval (seconds)</label>
-          <input type="number" id="admShortsAdInterval" placeholder="e.g. 60" style="margin-bottom:0;">
-          <small style="color:#aaa;font-size:0.75rem;">How often ads show in Short videos</small>
-        </div>
-        <div>
-          <label class="form-label">🎬 Long Video Ad Interval (seconds)</label>
-          <input type="number" id="admLongAdInterval" placeholder="e.g. 300" style="margin-bottom:0;">
-          <small style="color:#aaa;font-size:0.75rem;">How often ads show in Long videos</small>
-        </div>
+        <div><label class="form-label">Shorts Skip After (sec)</label><input type="number" id="admShortsAdSkip" placeholder="5"></div>
+        <div><label class="form-label">Long Skip After (sec)</label><input type="number" id="admLongAdSkip" placeholder="10"></div>
       </div>
-
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
-        <div>
-          <label class="form-label">Shorts Skip After (seconds)</label>
-          <input type="number" id="admShortsAdSkip" placeholder="e.g. 5" style="margin-bottom:0;">
-        </div>
-        <div>
-          <label class="form-label">Long Video Skip After (seconds)</label>
-          <input type="number" id="admLongAdSkip" placeholder="e.g. 10" style="margin-bottom:0;">
-        </div>
-      </div>
-
-      <div style="background:rgba(255,153,0,0.06);border:1px solid rgba(255,153,0,0.2);border-radius:8px;padding:10px;margin-bottom:12px;font-size:0.8rem;color:#aaa;">
-        <b style="color:#ff9900;">Short video</b> = under 60 seconds watch time &nbsp;|&nbsp; <b style="color:#00f2ea;">Long video</b> = 60+ seconds
-      </div>
-
-      <button class="btn btn-sm" style="background:#ff9900;" onclick="Admin.saveVideoAdConfig()">
-        <i class="fas fa-save"></i> Save Ad Settings
-      </button>
+      <button class="btn btn-sm" style="background:#ff9900;" onclick="Admin.saveVideoAdConfig()"><i class="fas fa-save"></i> Save Ad Settings</button>
     </div>
-
-    <!-- Add Admin Video -->
+    <!-- PER VIEW COIN RATE -->
     <div class="glass">
-      <h3 style="margin-bottom:15px;"><i class="fas fa-plus-circle" style="color:var(--success);margin-right:6px;"></i>Add Admin Video (YouTube)</h3>
+      <h3 style="margin-bottom:12px;"><i class="fas fa-coins" style="color:gold;margin-right:6px;"></i>Per View Coin Rate</h3>
+      <p style="color:#aaa;font-size:0.82rem;margin-bottom:10px;">Uploaders earn this many coins per view on their videos.</p>
+      <div class="input-group"><i class="fas fa-coins"></i><input type="number" id="admViewCoinRate" placeholder="0.001" step="0.001"></div>
+      <button class="btn btn-sm btn-outline" onclick="Admin.saveViewCoinRate()"><i class="fas fa-save"></i> Save</button>
+    </div>
+    <!-- ADD ADMIN VIDEO -->
+    <div class="glass">
+      <h3 style="margin-bottom:12px;"><i class="fas fa-plus-circle" style="color:var(--success);margin-right:6px;"></i>Add YouTube Video</h3>
       <div class="input-group"><i class="fas fa-heading"></i><input type="text" id="admVTitle" placeholder="Video Title"></div>
       <div class="input-group"><i class="fab fa-youtube" style="color:#ff0000;"></i><input type="text" id="admVUrl" placeholder="YouTube URL or Video ID"></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-        <div><label class="form-label">Reward (Coins)</label><input type="number" id="admVReward" placeholder="50"></div>
-        <div><label class="form-label">Watch Time (seconds)</label><input type="number" id="admVDuration" placeholder="30"></div>
+        <div><label class="form-label">Watch Time (sec)</label><input type="number" id="admVDuration" placeholder="30"></div>
+        <div><label class="form-label">Category</label>
+          <select id="admVCategory" style="margin-bottom:0;">
+            <option value="Education">📚 Education</option>
+            <option value="Entertainment">🎭 Entertainment</option>
+            <option value="Music">🎵 Music</option>
+            <option value="Technology">💻 Technology</option>
+            <option value="Shorts">⚡ Shorts</option>
+            <option value="Other">🎬 Other</option>
+          </select>
+        </div>
       </div>
       <div class="input-group"><i class="fas fa-image"></i><input type="text" id="admVThumb" placeholder="Thumbnail URL (optional)"></div>
       <button class="btn btn-success" onclick="Admin.addVideo()"><i class="fas fa-plus"></i> Add Video</button>
     </div>
-
-    <!-- Video List -->
+    <!-- VIDEO LIST -->
     <div class="glass">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-        <h3><i class="fas fa-list" style="color:var(--neon-cyan);margin-right:6px;"></i>All Videos</h3>
+        <h3>All Videos</h3>
         <span id="admVideoCount" style="color:#aaa;font-size:0.85rem;">0 videos</span>
       </div>
       <div id="admVideoList"></div>
     </div>
   </div>
 
-  <!-- MONETIZE -->
   <div id="tab-monetize" class="admin-tab-content hidden">
     <div class="glass">
       <h3 style="margin-bottom:15px;"><i class="fas fa-money-bill-wave" style="color:var(--neon-gold);margin-right:6px;"></i>Monetization Requests</h3>
-      <div style="background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.15);border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:0.82rem;color:#aaa;">
-        <i class="fas fa-info-circle" style="color:var(--neon-gold);margin-right:6px;"></i>
-        Only monetized users can withdraw BDT. Users must reach 1,000,000 coins to apply.
-      </div>
       <div id="admMonetizeList"></div>
     </div>
   </div>
 
-  <!-- CONFIG -->
   <div id="tab-config" class="admin-tab-content hidden">
     <div class="glass">
       <h3 style="margin-bottom:15px;"><i class="fas fa-gamepad" style="color:var(--neon-purple);margin-right:6px;"></i>Game Settings</h3>
@@ -509,7 +433,8 @@
     </div>
     <div class="glass">
       <h3 style="margin-bottom:15px;"><i class="fas fa-ad" style="color:var(--neon-cyan);margin-right:6px;"></i>Home Banner Ad Code</h3>
-      <textarea id="admAdCode" style="width:100%;height:100px;background:#1a1a2e;color:lime;border:1px solid #333;border-radius:10px;padding:10px;font-size:0.8rem;" placeholder="Paste HTML ad code here..."></textarea>
+      <p style="color:#aaa;font-size:0.82rem;margin-bottom:8px;">Paste Adsterra Social Bar, banner, or any ad script here.</p>
+      <textarea id="admAdCode" style="width:100%;height:120px;background:#1a1a2e;color:lime;border:1px solid #333;border-radius:10px;padding:10px;font-size:0.8rem;" placeholder="Paste Adsterra or ad code here..."></textarea>
     </div>
     <div class="glass">
       <h3 style="margin-bottom:15px;"><i class="fas fa-wrench" style="color:var(--danger);margin-right:6px;"></i>System</h3>
@@ -524,7 +449,7 @@
   </div>
 </div>
 
-<!-- ===== BOTTOM NAV ===== -->
+<!-- BOTTOM NAV -->
 <nav class="bottom-nav hidden" id="mainNav">
   <a onclick="Router.go('home')"     class="nav-item active" id="nav-home"><i class="fas fa-home"></i>Home</a>
   <a onclick="Router.go('games')"    class="nav-item" id="nav-games"><i class="fas fa-gamepad"></i>Play</a>
@@ -534,13 +459,29 @@
   <a onclick="Router.go('profile')"  class="nav-item" id="nav-profile"><i class="fas fa-user-circle"></i>Profile</a>
 </nav>
 
-<!-- ===== VIDEOS PAGE ===== -->
+<!-- VIDEOS PAGE — YouTube style -->
 <div id="page-videos" class="page-section hidden">
-  <div style="padding:20px 20px 10px;">
-    <h2 class="text-gradient"><i class="fas fa-play-circle"></i> Watch & Earn</h2>
-    <p style="color:#aaa;font-size:0.85rem;">Watch videos and support creators</p>
+  <!-- Search Bar -->
+  <div class="yt-search-bar">
+    <div class="yt-search-input-wrap">
+      <i class="fas fa-search"></i>
+      <input type="text" id="videoSearchInput" placeholder="Search videos..." oninput="VideoSystem.search(this.value)">
+      <button class="yt-search-clear hidden" id="searchClearBtn" onclick="VideoSystem.clearSearch()"><i class="fas fa-times"></i></button>
+    </div>
   </div>
 
+  <!-- Category filter -->
+  <div class="yt-category-bar" id="categoryBar">
+    <button class="yt-cat-btn active" onclick="VideoSystem.filterCategory('All', this)">All</button>
+    <button class="yt-cat-btn" onclick="VideoSystem.filterCategory('Shorts', this)">⚡ Shorts</button>
+    <button class="yt-cat-btn" onclick="VideoSystem.filterCategory('Education', this)">📚 Education</button>
+    <button class="yt-cat-btn" onclick="VideoSystem.filterCategory('Entertainment', this)">🎭 Entertainment</button>
+    <button class="yt-cat-btn" onclick="VideoSystem.filterCategory('Music', this)">🎵 Music</button>
+    <button class="yt-cat-btn" onclick="VideoSystem.filterCategory('Technology', this)">💻 Technology</button>
+    <button class="yt-cat-btn" onclick="VideoSystem.filterCategory('Sports', this)">⚽ Sports</button>
+  </div>
+
+  <!-- Tab switcher -->
   <div class="video-tabs">
     <button class="video-tab-btn active" id="vtab-btn-watch"    onclick="VideoSystem.switchTab('watch')"><i class="fas fa-play"></i> Watch</button>
     <button class="video-tab-btn"        id="vtab-btn-upload"   onclick="VideoSystem.switchTab('upload')"><i class="fas fa-upload"></i> Upload</button>
@@ -550,28 +491,11 @@
 
   <!-- WATCH TAB -->
   <div id="vtab-watch">
-    <div class="video-stats-bar glass">
-      <div class="video-stat-item">
-        <i class="fas fa-coins" style="color:gold;"></i>
-        <div><span id="vidTodayEarned">0</span> Coins<small>Today</small></div>
-      </div>
-      <div class="video-stat-divider"></div>
-      <div class="video-stat-item">
-        <i class="fas fa-video" style="color:var(--neon-cyan);"></i>
-        <div><span id="vidTodayCount">0</span> Videos<small>Watched Today</small></div>
-      </div>
-      <div class="video-stat-divider"></div>
-      <div class="video-stat-item">
-        <i class="fas fa-fire" style="color:#ff6b35;"></i>
-        <div><span id="vidTotalWatched">0</span> Total<small>All Time</small></div>
-      </div>
-    </div>
     <div style="padding:0 15px 20px 15px;">
       <div id="videoList"></div>
       <div id="videoEmptyMsg" class="hidden" style="text-align:center;padding:40px 20px;color:#aaa;">
         <i class="fas fa-video-slash" style="font-size:3rem;margin-bottom:15px;display:block;opacity:0.4;"></i>
-        <p>No videos available right now.</p>
-        <small>Check back later!</small>
+        <p>No videos found.</p>
       </div>
     </div>
   </div>
@@ -582,12 +506,11 @@
       <div class="upload-hero">
         <i class="fas fa-cloud-upload-alt"></i>
         <h3>Upload Your Video</h3>
-        <p>Earn 0.001 coin per view. Monetized creators also earn BDT!</p>
+        <p>Earn coins for every view you get!</p>
       </div>
       <label class="form-label">Select Video File</label>
       <div class="file-upload-zone" onclick="document.getElementById('uVFile').click()">
-        <i class="fas fa-video"></i>
-        <p>Click to select video</p>
+        <i class="fas fa-video"></i><p>Click to select video</p>
         <small>MP4, WebM, MOV • Max 100MB</small>
         <input type="file" id="uVFile" accept="video/*" style="display:none;" onchange="VideoSystem.previewFile(this)">
       </div>
@@ -596,7 +519,9 @@
         <small id="uploadFileInfo" style="color:#aaa;display:block;margin-top:5px;"></small>
       </div>
       <label class="form-label">Video Title</label>
-      <div class="input-group"><i class="fas fa-heading"></i><input type="text" id="uVTitle" placeholder="Enter video title (max 60 chars)" maxlength="60"></div>
+      <div class="input-group"><i class="fas fa-heading"></i><input type="text" id="uVTitle" placeholder="Enter video title" maxlength="60"></div>
+      <label class="form-label">Description (optional)</label>
+      <textarea id="uVDesc" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid #333;border-radius:10px;padding:10px;color:white;font-size:0.9rem;min-height:70px;margin-bottom:12px;" placeholder="Describe your video..."></textarea>
       <label class="form-label">Category</label>
       <select id="uVCategory" style="margin-bottom:12px;">
         <option value="Education">📚 Education</option>
@@ -607,66 +532,94 @@
         <option value="Shorts">⚡ Shorts (under 60s)</option>
         <option value="Other">🎬 Other</option>
       </select>
-      <div class="upload-terms">
-        <i class="fas fa-info-circle"></i>
-        <span>No adult, violent or spam content. Violations result in account ban.</span>
-      </div>
-      <button id="uploadSubmitBtn" class="btn btn-success" onclick="VideoSystem.submitVideo()">
-        <i class="fas fa-paper-plane"></i> Submit Video
-      </button>
+      <div class="upload-terms"><i class="fas fa-info-circle"></i><span>No adult or violent content. Violations result in account ban.</span></div>
+      <button id="uploadSubmitBtn" class="btn btn-success" onclick="VideoSystem.submitVideo()"><i class="fas fa-paper-plane"></i> Upload Video</button>
     </div>
   </div>
 
   <!-- MY VIDEOS TAB -->
   <div id="vtab-myvideos" class="hidden">
-    <div style="padding:0 15px 100px 15px;">
-      <div id="myVideosList"></div>
-    </div>
+    <div style="padding:0 15px 100px 15px;"><div id="myVideosList"></div></div>
   </div>
 
   <!-- MONETIZE TAB -->
   <div id="vtab-monetize" class="hidden">
-    <div style="padding:0 15px 20px 15px;">
-      <div id="monetizeContent">
-        <p style="color:#aaa;text-align:center;padding:40px;"><i class="fas fa-spinner fa-spin"></i> Loading...</p>
-      </div>
-    </div>
+    <div style="padding:0 15px 20px 15px;"><div id="monetizeContent"><p style="color:#aaa;text-align:center;padding:40px;"><i class="fas fa-spinner fa-spin"></i> Loading...</p></div></div>
   </div>
 
   <div style="height:80px;"></div>
 </div>
 
-<!-- ===== CHANNEL PAGE ===== -->
+<!-- CHANNEL PAGE -->
 <div id="page-channel" class="page-section hidden">
   <div style="padding:10px 15px 0;">
-    <button class="btn btn-sm btn-outline" id="channelBackBtn" onclick="history.back()" style="margin-bottom:5px;">
-      <i class="fas fa-arrow-left"></i> Back
-    </button>
+    <button class="btn btn-sm btn-outline" onclick="ChannelSystem.goBack()" style="margin-bottom:5px;"><i class="fas fa-arrow-left"></i> Back</button>
   </div>
-
-  <!-- Channel Edit Bar (visible only to owner) -->
-  <div id="channelEditBar" class="hidden glass" style="margin:0 15px 10px;padding:12px;">
+  <div id="channelEditBar" class="hidden glass" style="margin:0 15px 10px;padding:12px;border:1px solid rgba(0,242,234,0.2);">
     <p style="color:#aaa;font-size:0.82rem;margin-bottom:8px;"><i class="fas fa-edit" style="color:var(--neon-cyan);"></i> Edit your channel</p>
-    <div class="input-group" style="margin-bottom:8px;">
-      <i class="fas fa-heading"></i>
-      <input type="text" id="channelDescInput" placeholder="Channel description (optional)">
-    </div>
-    <div class="input-group" style="margin-bottom:8px;">
-      <i class="fas fa-image"></i>
-      <input type="text" id="channelBannerInput" placeholder="Banner image URL (optional)">
-    </div>
-    <button class="btn btn-sm btn-success" onclick="ChannelSystem.saveChannelInfo()"><i class="fas fa-save"></i> Save Channel Info</button>
+    <div class="input-group" style="margin-bottom:8px;"><i class="fas fa-align-left"></i><input type="text" id="channelDescInput" placeholder="Channel description"></div>
+    <div class="input-group" style="margin-bottom:8px;"><i class="fas fa-image"></i><input type="text" id="channelBannerInput" placeholder="Banner image URL"></div>
+    <button class="btn btn-sm btn-success" onclick="ChannelSystem.saveChannelInfo()"><i class="fas fa-save"></i> Save</button>
   </div>
-
   <div id="channelHeader"></div>
-  <div style="padding:15px 15px 100px 15px;">
+  <div style="padding:0 15px 100px 15px;">
     <h3 style="margin-bottom:10px;"><i class="fas fa-play-circle" style="color:var(--neon-cyan);margin-right:8px;"></i>Videos</h3>
     <div id="channelVideoList"></div>
   </div>
 </div>
 
-<!-- ===== VIDEO AD OVERLAY ===== -->
-<div id="videoAdOverlay" class="modal-overlay hidden" style="flex-direction:column;padding:20px;">
+<!-- VIDEO PLAYER — Full screen YouTube style -->
+<div id="videoOverlay" class="modal-overlay hidden" style="flex-direction:column;padding:0;background:#000;">
+  <div class="yt-player-wrapper">
+    <!-- Video frame -->
+    <div class="yt-video-frame">
+      <iframe id="vpFrame" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+    <!-- Info below video -->
+    <div class="yt-video-info" style="background:#0a0a1a;padding:14px 15px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+        <div style="flex:1;">
+          <h3 id="vpTitle" style="margin:0;font-size:1rem;color:white;line-height:1.3;">Video Title</h3>
+          <div style="display:flex;align-items:center;gap:10px;margin-top:6px;flex-wrap:wrap;">
+            <span id="vpViewCount" style="color:#aaa;font-size:0.82rem;"><i class="fas fa-eye"></i> 0 views</span>
+            <span id="vpCategory" style="color:#aaa;font-size:0.82rem;"></span>
+          </div>
+        </div>
+        <button onclick="VideoSystem.closePlayer()" style="background:none;border:none;color:#aaa;font-size:1.3rem;cursor:pointer;padding:4px;"><i class="fas fa-times"></i></button>
+      </div>
+      <!-- Uploader row -->
+      <div id="vpUploaderRow" style="display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid #1a1a2e;border-bottom:1px solid #1a1a2e;margin-bottom:10px;">
+        <img id="vpUploaderAvatar" src="" style="width:36px;height:36px;border-radius:50%;object-fit:cover;">
+        <div style="flex:1;">
+          <div id="vpUploaderName" style="color:white;font-size:0.9rem;font-weight:bold;cursor:pointer;"></div>
+          <div id="vpSubCount" style="color:#aaa;font-size:0.78rem;"></div>
+        </div>
+        <button id="vpSubBtn" class="btn btn-sm" onclick="VideoSystem.subscribeFromPlayer()" style="padding:6px 14px;font-size:0.8rem;">Subscribe</button>
+      </div>
+      <!-- Description -->
+      <div id="vpDesc" style="color:#aaa;font-size:0.83rem;line-height:1.5;margin-bottom:12px;"></div>
+      <!-- Watch progress -->
+      <div style="background:#1a1a2e;border-radius:10px;padding:10px 12px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+          <span style="color:#aaa;font-size:0.82rem;">Watch Progress</span>
+          <span id="vpProgressText" style="color:var(--neon-cyan);font-weight:bold;font-size:0.82rem;">0%</span>
+        </div>
+        <div class="video-progress-bar"><div id="vpProgressFill" style="width:0%;"></div></div>
+        <div style="display:flex;justify-content:space-between;margin-top:6px;">
+          <span style="color:#666;font-size:0.78rem;">Elapsed: <b id="vpTimeElapsed" style="color:#aaa;">0s</b></span>
+          <span style="color:#666;font-size:0.78rem;">Required: <b id="vpTimeNeeded" style="color:#aaa;">0s</b></span>
+        </div>
+      </div>
+      <div id="vpWatchMsg" style="text-align:center;color:#555;font-size:0.82rem;margin-top:8px;">Watching to support the creator...</div>
+      <button id="vpClaimBtn" class="btn btn-success hidden" style="margin-top:10px;" onclick="VideoSystem.claimReward()">
+        <i class="fas fa-check-circle"></i> Mark as Watched
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- VIDEO AD OVERLAY -->
+<div id="videoAdOverlay" class="modal-overlay hidden" style="flex-direction:column;padding:20px;background:rgba(0,0,0,0.95);">
   <div class="video-ad-wrapper glass">
     <div class="video-ad-header">
       <span style="color:#aaa;font-size:0.8rem;"><i class="fas fa-ad"></i> Advertisement</span>
@@ -677,44 +630,13 @@
       <div class="ad-countdown-bar"><div id="adCountdownFill"></div></div>
       <div style="display:flex;justify-content:space-between;margin-top:6px;">
         <span style="color:#aaa;font-size:0.8rem;">Ad ends in <b id="adCountdownText">5s</b></span>
-        <span style="color:var(--neon-gold);font-size:0.8rem;">Video starting after ad...</span>
+        <span style="color:var(--neon-gold);font-size:0.8rem;">Video continues after ad</span>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ===== VIDEO PLAYER OVERLAY ===== -->
-<div id="videoOverlay" class="modal-overlay hidden" style="flex-direction:column;padding:0;">
-  <div class="video-player-wrapper">
-    <div class="video-player-header">
-      <div>
-        <h4 id="vpTitle" style="margin:0;font-size:1rem;">Video Title</h4>
-        <small id="vpReward" style="color:var(--neon-gold);">Creator earns 0.001 coin from your view</small>
-      </div>
-      <button class="video-close-btn" onclick="VideoSystem.closePlayer()"><i class="fas fa-times"></i></button>
-    </div>
-    <div class="video-iframe-container">
-      <iframe id="vpFrame" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-    </div>
-    <div class="video-progress-section">
-      <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-        <span style="color:#aaa;font-size:0.85rem;">Watch Progress</span>
-        <span id="vpProgressText" style="color:var(--neon-cyan);font-weight:bold;font-size:0.85rem;">0%</span>
-      </div>
-      <div class="video-progress-bar"><div id="vpProgressFill" style="width:0%;"></div></div>
-      <div class="video-timer-row">
-        <div class="video-timer-box"><i class="fas fa-clock" style="color:var(--neon-cyan);"></i><span>Time: <b id="vpTimeElapsed">0s</b></span></div>
-        <div class="video-timer-box"><i class="fas fa-flag" style="color:var(--neon-gold);"></i><span>Needed: <b id="vpTimeNeeded">0s</b></span></div>
-      </div>
-      <button id="vpClaimBtn" class="btn btn-success hidden" onclick="VideoSystem.claimReward()">
-        <i class="fas fa-coins"></i> Claim Reward!
-      </button>
-      <div id="vpWatchMsg" style="text-align:center;color:#aaa;font-size:0.85rem;margin-top:10px;">Keep watching to support the creator...</div>
-    </div>
-  </div>
-</div>
-
-<!-- ===== TASK OVERLAY ===== -->
+<!-- TASK OVERLAY -->
 <div id="taskOverlay" class="modal-overlay hidden">
   <div class="glass text-center" style="min-width:300px;max-width:90%;">
     <div class="loading-spinner" style="margin:0 auto 20px;"></div>
