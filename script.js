@@ -4,7 +4,7 @@
 'use strict';
 
 const SESSION_KEY = 'taskmint_session';
-const ADMIN_PIN   = 'admin@246';
+const ADMIN_PIN   = 'admin123';
 
 const FIREBASE_CONFIG = {
   apiKey:            "AIzaSyDZSJfWPLRjxlfceUiUHQQ0JonunLVe2_c",
@@ -384,15 +384,20 @@ var UI = {
     var l = document.getElementById('taskList');
     if (!l) return;
     var tasks = await FDB.getTasks();
-    if (!tasks.length) { l.innerHTML = '<p style="color:#aaa;text-align:center;padding:20px;">No active tasks right now.</p>'; return; }
+    if (!tasks.length) {
+      l.innerHTML = '<p style="color:#aaa;text-align:center;padding:20px;">No active tasks right now.</p>';
+      return;
+    }
     l.innerHTML = '';
     tasks.forEach(function(t) {
       var div = document.createElement('div');
       div.className = 'task-card glass';
+      var link   = (t.link || '#');
+      var reward = parseInt(t.reward) || 0;
       div.innerHTML =
         '<img src="' + (t.icon||'https://cdn-icons-png.flaticon.com/512/149/149071.png') + '" class="task-icon" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/149/149071.png\'">' +
-        '<div class="task-info"><b>' + t.title + '</b><span class="coin-badge">+' + t.reward + ' Coins</span></div>' +
-        '<button class="btn btn-sm task-btn" onclick="Tasks.start(' + JSON.stringify(t.link||'#') + ',' + t.reward + ')"><i class="fas fa-play"></i> Start</button>';
+        '<div class="task-info"><b>' + t.title + '</b><span class="coin-badge">+' + reward + ' Coins</span></div>' +
+        '<button class="btn btn-sm task-btn" onclick="Tasks.start(\'' + link.replace(/'/g,"\\'") + '\',' + reward + ')"><i class="fas fa-play"></i> Start</button>';
       l.appendChild(div);
     });
   },
@@ -710,12 +715,18 @@ var Tasks = {
     if (link && link !== '#') window.open(link, '_blank');
     var ov = document.getElementById('taskOverlay');
     var te = document.getElementById('taskTimer');
+    if (!ov || !te) { Tasks.complete(reward); return; }
     ov.classList.remove('hidden');
     var left = _appConfig.adTimer || 10;
     te.textContent = left;
     var iv = setInterval(function() {
-      left--; te.textContent = left;
-      if (left <= 0) { clearInterval(iv); ov.classList.add('hidden'); Tasks.complete(reward); }
+      left--;
+      te.textContent = left;
+      if (left <= 0) {
+        clearInterval(iv);
+        ov.classList.add('hidden');
+        Tasks.complete(reward);
+      }
     }, 1000);
   },
 
