@@ -4,7 +4,7 @@
 'use strict';
 
 const SESSION_KEY = 'taskmint_session';
-const ADMIN_PIN   = 'admin123';
+const ADMIN_PIN   = 'admin@246';
 
 const FIREBASE_CONFIG = {
   apiKey:            "AIzaSyDZSJfWPLRjxlfceUiUHQQ0JonunLVe2_c",
