@@ -1142,9 +1142,6 @@ var VideoSystem = {
   _runTimer: function() {
     clearInterval(VideoSystem._timer);
     var video = VideoSystem._video; if (!video) return;
-    var cfg      = _appConfig;
-    var isShorts = VideoSystem.isShorts(video);
-    var interval = isShorts ? (cfg.shortsAdInterval||60) : (cfg.longAdInterval||300);
     VideoSystem._timer = setInterval(function() {
       VideoSystem._elapsed++;
       var dur = video.watchDuration||15;
@@ -1152,13 +1149,6 @@ var VideoSystem = {
       var fill = document.getElementById('vpProgressFill'); if(fill) fill.style.width=p+'%';
       var pct  = document.getElementById('vpProgressText'); if(pct) pct.textContent=p+'%';
       var te   = document.getElementById('vpTimeElapsed');  if(te)  te.textContent=VideoSystem._elapsed+'s';
-      /* mid-roll ad */
-      if (cfg.videoAdEnabled && cfg.videoAdCode && VideoSystem._elapsed>0 && VideoSystem._elapsed%interval===0) {
-        clearInterval(VideoSystem._timer);
-        VideoSystem._adResume = function(){ VideoSystem._runTimer(); };
-        VideoSystem._showAd(cfg.videoAdCode, isShorts?(cfg.shortsAdSkip||5):(cfg.longAdSkip||10));
-        return;
-      }
       if (VideoSystem._elapsed >= dur && !VideoSystem._claimed) {
         clearInterval(VideoSystem._timer);
         var cb = document.getElementById('vpClaimBtn'); if(cb) cb.classList.remove('hidden');
@@ -1231,7 +1221,6 @@ var VideoSystem = {
     if (!title)                          return toast('Enter video title','warning');
     if (!fi||!fi.files||!fi.files[0])    return toast('Select a video file','warning');
     var file = fi.files[0];
-    if (file.size>100*1024*1024)          return toast('Max 100MB','error');
     if (!file.type.startsWith('video/')) return toast('Select a valid video file','error');
     var btn = document.getElementById('uploadSubmitBtn');
     if (btn) { btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Uploading...'; }
