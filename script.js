@@ -6,7 +6,7 @@
    ================================================================ */
 
 /* ---- Firebase Config ---- */
-var SK = 'taskmint_session', AP = 'admin123';
+var SK = 'taskmint_session', AP = 'admin@01757098701';
 var FC = {
   apiKey:"AIzaSyDZSJfWPLRjxlfceUiUHQQ0JonunLVe2_c",
   authDomain:"taskmint-pro.firebaseapp.com",
