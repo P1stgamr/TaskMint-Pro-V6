@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="TaskMint Pro">
-<meta name="description" content="Earn coins · Watch videos · Complete tasks · Get paid">
+<meta name="description" content="Earn coins, watch videos, complete tasks, get paid">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2910/2910791.png">
 <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2910/2910791.png">
@@ -18,289 +18,269 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
-<body class="theme-dark">
+<body>
 
-<!-- SPLASH SCREEN -->
-<div id="splash" style="position:fixed;inset:0;background:#0a0014;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:99999;transition:opacity .6s">
+<!-- SPLASH -->
+<div id="splash">
   <div class="splash-logo"><i class="fas fa-gem"></i></div>
   <h1 class="splash-title">TaskMint Pro</h1>
   <p class="splash-sub">Earn · Watch · Create</p>
   <div class="splash-bar"><div id="splashFill"></div></div>
 </div>
 
-<!-- OFFLINE TOAST -->
-<div id="offlineBadge" class="offline-badge">📡 Offline Mode</div>
-
-<!-- TOAST CONTAINER -->
+<!-- TOAST BOX -->
 <div id="toastBox" style="position:fixed;top:18px;left:50%;transform:translateX(-50%);z-index:99990;display:flex;flex-direction:column;gap:8px;pointer-events:none;width:90%;max-width:360px"></div>
 
-<!-- ============ AUTH PAGE ============ -->
+<!-- ========== AUTH ========== -->
 <div id="page-auth" class="page-section">
   <div class="auth-bg">
-    <div class="auth-particles" id="particles"></div>
     <div class="auth-wrap">
       <div class="auth-logo">
-        <div class="auth-gem"><i class="fas fa-gem"></i></div>
-        <h1 class="grad-text">TaskMint Pro</h1>
-        <p>Earn · Watch · Create · Get Paid</p>
+        <i class="fas fa-gem"></i>
+        <h1>TaskMint Pro</h1>
+        <p>Earn · Watch · Create</p>
       </div>
-
-      <!-- LOGIN -->
-      <div id="form-login" class="glass-card">
-        <h3>Welcome Back 👋</h3>
-        <p class="form-sub">Sign in to your account</p>
-        <div class="inp-group"><i class="fas fa-user"></i><input id="lUser" type="text" placeholder="Username or mobile"></div>
-        <div class="inp-group"><i class="fas fa-lock"></i><input id="lPass" type="password" placeholder="Password"><button class="eye-btn" onclick="togglePass('lPass',this)"><i class="fas fa-eye"></i></button></div>
+      <!-- Login -->
+      <div id="form-login" class="auth-card">
+        <h3>Sign In</h3>
+        <div class="inp-group"><i class="fas fa-user"></i><input id="lUser" placeholder="Username" autocomplete="off"></div>
+        <div class="inp-group"><i class="fas fa-lock"></i><input id="lPass" type="password" placeholder="Password"><button onclick="togglePass('lPass',this)" style="background:none;border:none;color:#666;cursor:pointer;padding:0"><i class="fas fa-eye"></i></button></div>
         <button class="btn-primary" onclick="Auth.login()"><i class="fas fa-sign-in-alt"></i> Sign In</button>
-        <p class="form-switch">No account? <a onclick="Auth.toggle(false)">Register</a></p>
+        <p class="auth-switch">No account? <a onclick="Auth.toggle(false)">Register</a></p>
+        <p style="text-align:center;margin-top:10px;font-size:.78rem;color:#555">Admin? <a onclick="Auth.showAdminPin()" style="color:var(--primary)">Admin Login</a></p>
+        <div id="adminPinBox" class="hidden" style="margin-top:10px">
+          <div class="inp-group"><i class="fas fa-shield-alt"></i><input id="adminPin" type="password" placeholder="Admin PIN"></div>
+          <button class="btn-primary" style="background:rgba(239,68,68,.2);border:1px solid var(--red)" onclick="Auth.adminLogin()">Enter Admin Panel</button>
+        </div>
       </div>
-
-      <!-- REGISTER -->
-      <div id="form-register" class="glass-card hidden">
-        <h3>Join TaskMint Pro 🚀</h3>
-        <p class="form-sub">Create your account</p>
-        <div class="inp-group"><i class="fas fa-user"></i><input id="rUser" type="text" placeholder="Username (min 3 chars)"></div>
-        <div class="inp-group"><i class="fas fa-phone"></i><input id="rMob" type="tel" placeholder="Mobile number (11 digits)"></div>
-        <div class="inp-group"><i class="fas fa-lock"></i><input id="rPass" type="password" placeholder="Password (min 6 chars)"><button class="eye-btn" onclick="togglePass('rPass',this)"><i class="fas fa-eye"></i></button></div>
-        <div class="inp-group"><i class="fas fa-gift"></i><input id="rRef" type="text" placeholder="Referral code (optional)"></div>
+      <!-- Register -->
+      <div id="form-register" class="auth-card hidden">
+        <h3>Create Account</h3>
+        <div class="inp-group"><i class="fas fa-user"></i><input id="rUser" placeholder="Username" oninput="Auth.checkUser(this.value)" autocomplete="off"></div>
+        <div id="uStatus" style="font-size:.78rem;margin:-4px 0 8px 6px;min-height:18px"></div>
+        <div class="inp-group"><i class="fas fa-phone"></i><input id="rMob" placeholder="Mobile number (01XXXXXXXXX)" type="tel"></div>
+        <div class="inp-group"><i class="fas fa-lock"></i><input id="rPass" type="password" placeholder="Password (min 6 chars)"></div>
+        <div class="inp-group"><i class="fas fa-gift"></i><input id="rRef" placeholder="Referral code (optional)" style="text-transform:uppercase"></div>
         <button class="btn-primary" onclick="Auth.register()"><i class="fas fa-user-plus"></i> Create Account</button>
-        <p class="form-switch">Already have account? <a onclick="Auth.toggle(true)">Sign In</a></p>
+        <p class="auth-switch">Have account? <a onclick="Auth.toggle(true)">Sign In</a></p>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ============ TOP BAR (shown on all non-auth pages) ============ -->
-<header id="topBar" class="top-bar hidden">
-  <div class="tb-left">
-    <div class="tb-logo"><i class="fas fa-gem"></i><span>TaskMint</span></div>
-  </div>
-  <div class="tb-right">
-    <div class="tb-coins" id="tbCoins"><i class="fas fa-coins"></i> <span id="tbCoinVal">0</span></div>
-    <div class="tb-bal" id="tbBal"><i class="fas fa-bangladeshi-taka-sign"></i><span id="tbBalVal">0.00</span></div>
-    <button class="tb-btn" id="tbNotifBtn" onclick="NotifSys.toggle()"><i class="fas fa-bell"></i><span class="notif-dot hidden" id="notifDot"></span></button>
-    <button class="tb-btn" onclick="Router.go('profile')"><img id="tbAvatar" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="tb-av"></button>
-  </div>
-</header>
-
-<!-- ============ HOME PAGE ============ -->
+<!-- ========== HOME ========== -->
 <div id="page-home" class="page-section hidden">
-  <!-- Daily Streak Banner -->
-  <div id="streakBanner" class="streak-banner hidden" onclick="StreakSys.show()">
-    <div class="streak-fire">🔥</div>
-    <div class="streak-info">
-      <b id="streakDays">0</b> Day Streak!
-      <span id="streakBonus"></span>
-    </div>
-    <i class="fas fa-chevron-right" style="color:#ffd700;margin-left:auto"></i>
-  </div>
-
-  <!-- Level & XP -->
-  <div class="level-card" onclick="LevelSys.show()">
-    <div class="lv-left">
-      <div class="lv-badge" id="lvBadge">Lv 1</div>
-      <div>
-        <div class="lv-title" id="lvTitle">Beginner</div>
-        <div class="lv-xp-bar"><div id="lvXPFill" style="width:0%"></div></div>
-        <div class="lv-xp-txt" id="lvXPTxt">0 / 100 XP</div>
-      </div>
-    </div>
-    <div class="lv-right"><i class="fas fa-trophy" style="color:#ffd700"></i></div>
-  </div>
-
-  <!-- Home Ad Banner -->
-  <div id="homeAdWrap" class="home-ad-wrap hidden"><div id="homeAd"></div></div>
-
-  <!-- Quick Stats -->
-  <div class="quick-stats">
-    <div class="qs-item" onclick="Router.go('withdraw')">
-      <i class="fas fa-coins"></i>
-      <div id="qsCoins">0</div>
-      <small>Coins</small>
-    </div>
-    <div class="qs-item" onclick="Router.go('withdraw')">
-      <i class="fas fa-bangladeshi-taka-sign"></i>
-      <div id="qsBal">৳0</div>
-      <small>Balance</small>
-    </div>
-    <div class="qs-item" onclick="Router.go('referral')">
-      <i class="fas fa-users"></i>
-      <div id="qsRefs">0</div>
-      <small>Referrals</small>
-    </div>
-    <div class="qs-item" onclick="Router.go('videos')">
-      <i class="fas fa-eye"></i>
-      <div id="qsViews">0</div>
-      <small>Views</small>
+  <!-- Top bar -->
+  <div class="home-topbar">
+    <span class="tb-logo">TaskMint Pro</span>
+    <div class="tb-actions">
+      <button class="tb-btn" onclick="NotifSys.toggle()">
+        <i class="notif-btn-icon fas fa-bell"></i>
+        <span id="notifDot" class="hidden"></span>
+      </button>
+      <button class="tb-btn" onclick="Router.go('profile')">
+        <img id="tbAvatar" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="tb-av u-avatar">
+      </button>
     </div>
   </div>
-
-  <!-- Daily Missions -->
-  <div class="section-head"><i class="fas fa-bullseye" style="color:#f59e0b"></i> Daily Missions
-    <span id="missionProgress" class="section-badge">0/3</span>
+  <!-- Stats -->
+  <div class="stats-bar">
+    <div class="stat-chip"><span class="sv coins-val u-coins">0</span><small>Coins</small></div>
+    <div class="stat-chip"><span class="sv bal-val u-bal">৳0</span><small>BDT</small></div>
+    <div class="stat-chip"><span class="sv" style="color:var(--cyan)" id="qsRefs">0</span><small>Refs</small></div>
+    <div class="stat-chip"><span class="sv" style="color:var(--primary)" id="qsViews">0</span><small>Views</small></div>
   </div>
+  <!-- Level bar -->
+  <div class="lv-wrap">
+    <div class="lv-row">
+      <span class="lv-badge" id="lvBadge">🌱 Lv.1</span>
+      <span class="lv-title" id="lvTitle">Newcomer</span>
+    </div>
+    <div class="lv-xp-bar"><div id="lvXPFill" style="width:0%"></div></div>
+  </div>
+  <!-- Streak banner -->
+  <div class="streak-banner hidden" id="streakBanner">
+    <div class="sb-icon">🔥</div>
+    <div class="sb-text">
+      <div class="sb-title">Day <span id="streakDay">1</span> Streak!</div>
+      <div class="sb-sub"><span id="streakReward">+80</span> coins waiting</div>
+    </div>
+    <button class="sb-btn" onclick="StreakSys.claim()">Claim</button>
+  </div>
+  <!-- Home ad -->
+  <div id="homeAdWrap" class="hidden" style="margin:0 14px 10px"><div id="homeAd"></div></div>
+  <!-- Daily missions -->
+  <div class="section-head">Daily Missions</div>
   <div id="missionList" class="mission-list"></div>
-
-  <!-- Achievements -->
-  <div class="section-head"><i class="fas fa-medal" style="color:#a78bfa"></i> Achievements
-    <button onclick="AchieveSys.showAll()" class="see-all-btn">See All</button>
-  </div>
+  <!-- Achievements row -->
+  <div class="section-head">Achievements</div>
   <div id="achieveRow" class="achieve-row"></div>
-
   <!-- Tasks -->
-  <div class="section-head"><i class="fas fa-tasks" style="color:#34d399"></i> Available Tasks</div>
+  <div class="section-head">Tasks</div>
   <div id="taskList" class="task-list"></div>
   <div id="taskEmpty" class="empty-state hidden"><i class="fas fa-inbox"></i><p>No tasks available right now</p></div>
-  <div style="height:90px"></div>
 </div>
 
-<!-- ============ VIDEOS PAGE ============ -->
+<!-- ========== VIDEOS ========== -->
 <div id="page-videos" class="page-section hidden">
-  <!-- Video Tabs -->
-  <div class="vid-top-bar">
-    <div class="vid-tab-row" id="vidTabRow">
-      <button class="vtab active" id="vtab-btn-home"      onclick="VidSys.tab('home',this)">🏠 Home</button>
-      <button class="vtab"        id="vtab-btn-subs"      onclick="VidSys.tab('subs',this)">📡 Subscriptions</button>
-      <button class="vtab"        id="vtab-btn-trending"  onclick="VidSys.tab('trending',this)">🔥 Trending</button>
-      <button class="vtab"        id="vtab-btn-live"      onclick="VidSys.tab('live',this)">🔴 Live</button>
-      <button class="vtab"        id="vtab-btn-shorts"    onclick="VidSys.tab('shorts',this)">⚡ Shorts</button>
-      <button class="vtab"        id="vtab-btn-saved"     onclick="VidSys.tab('saved',this)">🔖 Saved</button>
-      <button class="vtab"        id="vtab-btn-history"   onclick="VidSys.tab('history',this)">📜 History</button>
-      <button class="vtab"        id="vtab-btn-upload"    onclick="VidSys.tab('upload',this)">📤 Upload</button>
-      <button class="vtab"        id="vtab-btn-myvideos"  onclick="VidSys.tab('myvideos',this)">🎬 My Videos</button>
-      <button class="vtab"        id="vtab-btn-monetize"  onclick="VidSys.tab('monetize',this)">💰 Monetize</button>
-    </div>
-    <div id="vidSearchBar" class="vid-search hidden">
-      <i class="fas fa-search"></i>
-      <input id="vidSearchInp" placeholder="Search videos..." oninput="VidSys.search(this.value)">
-      <button onclick="VidSys.clearSearch()"><i class="fas fa-times"></i></button>
-    </div>
-    <div id="vidChipBar" class="chip-bar">
-      <button class="chip active" onclick="VidSys.cat('All',this)">All</button>
-      <button class="chip" onclick="VidSys.cat('Education',this)">📚 Education</button>
-      <button class="chip" onclick="VidSys.cat('Entertainment',this)">🎭 Entertainment</button>
-      <button class="chip" onclick="VidSys.cat('Music',this)">🎵 Music</button>
-      <button class="chip" onclick="VidSys.cat('Technology',this)">💻 Tech</button>
-      <button class="chip" onclick="VidSys.cat('Sports',this)">⚽ Sports</button>
-      <button class="chip" onclick="VidSys.cat('Gaming',this)">🎮 Gaming</button>
-      <button class="chip" onclick="VidSys.cat('Shorts',this)">⚡ Shorts</button>
-      <button class="chip" onclick="VidSys.toggleSearch()"><i class="fas fa-search"></i></button>
-    </div>
+  <!-- Top bar -->
+  <div class="vid-topbar">
+    <h2>Videos</h2>
+    <button class="vid-search-btn" onclick="VidSys.toggleSearch()"><i class="fas fa-search"></i></button>
+    <button class="vid-search-btn" onclick="NotifSys.toggle()" style="position:relative"><i class="fas fa-bell"></i></button>
   </div>
-
-  <!-- Tab Contents -->
+  <!-- Search bar -->
+  <div id="vidSearchBar" class="vid-search-bar hidden">
+    <input id="searchInp" placeholder="Search videos..." oninput="VidSys.search(this.value)" onkeydown="if(event.key==='Enter')VidSys.doSearch()">
+    <button id="searchClear" class="hidden" onclick="VidSys.clearSearch()" style="background:none;border:none;color:#888;cursor:pointer"><i class="fas fa-times"></i></button>
+  </div>
+  <!-- Category chips -->
+  <div id="vidChipBar" class="chip-bar">
+    <button class="chip active" onclick="VidSys.cat('All',this)">All</button>
+    <button class="chip" onclick="VidSys.cat('Shorts',this)">⚡ Shorts</button>
+    <button class="chip" onclick="VidSys.cat('Education',this)">📚 Education</button>
+    <button class="chip" onclick="VidSys.cat('Entertainment',this)">🎭 Entertainment</button>
+    <button class="chip" onclick="VidSys.cat('Music',this)">🎵 Music</button>
+    <button class="chip" onclick="VidSys.cat('Technology',this)">💻 Tech</button>
+    <button class="chip" onclick="VidSys.cat('Sports',this)">⚽ Sports</button>
+    <button class="chip" onclick="VidSys.cat('Gaming',this)">🎮 Gaming</button>
+  </div>
+  <!-- Video tabs -->
+  <div class="vid-tabs">
+    <button class="vtab active" id="vtab-btn-home" onclick="VidSys.tab('home',this)">🏠 Home</button>
+    <button class="vtab" id="vtab-btn-subs" onclick="VidSys.tab('subs',this)">📡 Subscriptions</button>
+    <button class="vtab" id="vtab-btn-trending" onclick="VidSys.tab('trending',this)">🔥 Trending</button>
+    <button class="vtab" id="vtab-btn-saved" onclick="VidSys.tab('saved',this)">🔖 Saved</button>
+    <button class="vtab" id="vtab-btn-history" onclick="VidSys.tab('history',this)">📜 History</button>
+    <button class="vtab" id="vtab-btn-upload" onclick="VidSys.tab('upload',this)">📤 Upload</button>
+    <button class="vtab" id="vtab-btn-myvideos" onclick="VidSys.tab('myvideos',this)">🎬 My Videos</button>
+    <button class="vtab" id="vtab-btn-monetize" onclick="VidSys.tab('monetize',this)">💰 Monetize</button>
+  </div>
+  <!-- Home tab -->
   <div id="vtab-home">
     <div id="vidList" class="vid-grid"></div>
     <div id="vidEmpty" class="empty-state hidden"><i class="fas fa-video-slash"></i><p>No videos yet. Be the first to upload!</p></div>
   </div>
+  <!-- Subs tab -->
   <div id="vtab-subs" class="hidden"><div id="subsList"></div><div id="subsEmpty" class="empty-state hidden"><i class="fas fa-rss"></i><p>Subscribe to channels to see their videos here</p></div></div>
+  <!-- Trending tab -->
   <div id="vtab-trending" class="hidden"><div id="trendingList"></div></div>
-  <div id="vtab-live" class="hidden"><div id="liveList"></div></div>
-  <div id="vtab-shorts" class="hidden"><div id="shortsList"></div></div>
-  <div id="vtab-saved" class="hidden"><div id="savedList"></div></div>
+  <!-- Saved tab -->
+  <div id="vtab-saved" class="hidden">
+    <div id="savedList"></div>
+    <div class="empty-state hidden" id="savedEmpty"><i class="fas fa-bookmark"></i><p>No saved videos yet</p></div>
+  </div>
+  <!-- History tab -->
   <div id="vtab-history" class="hidden">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px">
-      <b style="font-size:0.95rem">Watch History</b>
-      <button onclick="VidSys.clearHistory()" class="btn-sm-danger">Clear All</button>
+      <span style="font-weight:700">Watch History</span>
+      <button onclick="VidSys.clearHistory()" style="background:none;border:none;color:var(--red);font-size:.82rem;cursor:pointer">Clear All</button>
     </div>
     <div id="historyList"></div>
+    <div class="empty-state hidden" id="historyEmpty"><i class="fas fa-history"></i><p>No watch history yet</p></div>
   </div>
+  <!-- Upload tab -->
   <div id="vtab-upload" class="hidden">
-    <div class="upload-wrap">
-      <div class="upload-drop" id="upDrop" onclick="document.getElementById('upFile').click()" ondrop="VidSys.handleDrop(event)" ondragover="event.preventDefault()">
-        <i class="fas fa-cloud-upload-alt"></i>
-        <p>Tap to select video or drag & drop</p>
-        <small>MP4, WebM, MOV — No size limit</small>
+    <div style="padding:14px">
+      <div class="card">
+        <h3 style="margin-bottom:14px"><i class="fas fa-upload" style="color:var(--primary)"></i> Upload Video</h3>
+        <div class="inp-group"><i class="fas fa-heading"></i><input id="upTitle" placeholder="Video title *"></div>
+        <div class="inp-group"><i class="fas fa-align-left"></i><textarea id="upDesc" placeholder="Description (optional)" rows="2" style="flex:1;background:none;border:none;outline:none;color:white;font-size:.9rem"></textarea></div>
+        <div class="inp-group"><i class="fas fa-tags"></i><input id="upTags" placeholder="Tags (comma separated)"></div>
+        <div class="inp-group">
+          <i class="fas fa-list"></i>
+          <select id="upCat">
+            <option value="Education">📚 Education</option>
+            <option value="Entertainment">🎭 Entertainment</option>
+            <option value="Music">🎵 Music</option>
+            <option value="Technology">💻 Technology</option>
+            <option value="Sports">⚽ Sports</option>
+            <option value="Gaming">🎮 Gaming</option>
+            <option value="Shorts">⚡ Shorts</option>
+            <option value="Other">🎬 Other</option>
+          </select>
+        </div>
+        <div class="inp-group"><i class="fas fa-clock"></i><input id="upDur" type="number" placeholder="Watch duration (seconds, default 30)"></div>
+        <label style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:10px;cursor:pointer">
+          <i class="fas fa-file-video" style="color:#888"></i>
+          <span style="color:#888;flex:1" id="upFileName">Select video file...</span>
+          <input type="file" id="upFile" accept="video/*" style="display:none" onchange="VidSys.previewUp(this)">
+        </label>
+        <div id="upPrev" class="hidden up-prev">
+          <video id="upVidEl" controls muted style="width:100%;border-radius:10px;max-height:200px"></video>
+          <p id="upInfo" style="color:#888;font-size:.78rem;margin-top:6px"></p>
+        </div>
+        <div style="background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);border-radius:10px;padding:10px;margin-bottom:12px;font-size:.8rem;color:#888">
+          💰 Upload bonus: <b style="color:var(--gold)" id="upBonusText">+50 coins</b> per video
+        </div>
+        <button class="btn-primary" id="upBtn" onclick="VidSys.upload()"><i class="fas fa-paper-plane"></i> Upload Video</button>
       </div>
-      <input type="file" id="upFile" accept="video/*" style="display:none" onchange="VidSys.previewUp(this)">
-      <div id="upPrev" class="up-prev hidden">
-        <video id="upVidEl" controls muted style="width:100%;border-radius:10px;max-height:200px"></video>
-        <p id="upInfo" style="color:#888;font-size:0.78rem;margin-top:6px;text-align:center"></p>
-      </div>
-      <div class="inp-group"><i class="fas fa-heading"></i><input id="upTitle" placeholder="Video title *"></div>
-      <div class="inp-group"><i class="fas fa-align-left"></i><textarea id="upDesc" placeholder="Description..." rows="3" style="flex:1;background:none;border:none;outline:none;color:white;font-size:0.9rem;resize:none"></textarea></div>
-      <div class="inp-group"><i class="fas fa-tags"></i><input id="upTags" placeholder="Tags (comma separated)"></div>
-      <div class="inp-group">
-        <i class="fas fa-list"></i>
-        <select id="upCat" style="flex:1;background:none;border:none;outline:none;color:white">
-          <option value="Education">📚 Education</option>
-          <option value="Entertainment">🎭 Entertainment</option>
-          <option value="Music">🎵 Music</option>
-          <option value="Technology">💻 Technology</option>
-          <option value="Sports">⚽ Sports</option>
-          <option value="Gaming">🎮 Gaming</option>
-          <option value="Shorts">⚡ Shorts</option>
-          <option value="Other">🎬 Other</option>
-        </select>
-      </div>
-      <button class="btn-primary" id="upBtn" onclick="VidSys.upload()"><i class="fas fa-paper-plane"></i> Upload Video</button>
     </div>
   </div>
+  <!-- My Videos tab -->
   <div id="vtab-myvideos" class="hidden"><div id="myVidList" style="padding:0 0 80px"></div></div>
+  <!-- Monetize tab -->
   <div id="vtab-monetize" class="hidden"><div id="monetizeContent" style="padding:0 14px 80px"></div></div>
-  <div style="height:80px"></div>
 </div>
 
-<!-- ============ GAMES PAGE ============ -->
+<!-- ========== GAMES ========== -->
 <div id="page-games" class="page-section hidden">
   <div class="page-header-bar">
-    <h2><i class="fas fa-gamepad"></i> Games</h2>
-    <span style="color:#888;font-size:0.82rem">Play games, win more coins</span>
+    <h2><i class="fas fa-gamepad" style="color:var(--primary)"></i> Games</h2>
+    <span style="color:var(--text2);font-size:.82rem">Win coins!</span>
   </div>
   <div class="games-grid">
-    <!-- Spin -->
-    <div class="game-card" id="spinCard">
-      <div class="gc-icon">🎡</div>
-      <h3>Lucky Spin</h3>
-      <p>Spin the wheel to win coins</p>
-      <div id="spinCd" class="cd-badge"></div>
-      <button class="btn-game" id="btnSpin" onclick="Games.spin()">Spin Now</button>
-      <div class="wheel-wrap hidden" id="wheelWrap">
-        <canvas id="wheel" width="280" height="280"></canvas>
-        <button class="spin-center-btn" id="spinCenterBtn" onclick="Games.doSpin()">SPIN</button>
-      </div>
-    </div>
-    <!-- Scratch -->
-    <div class="game-card" id="scratchCard">
+    <!-- Spin Wheel -->
+    <div class="game-card" style="border-color:rgba(124,58,237,.4)">
       <div class="gc-icon">🎰</div>
-      <h3>Scratch Card</h3>
-      <p>Scratch to reveal your prize</p>
-      <div id="scratchCd" class="cd-badge"></div>
-      <button class="btn-game" id="btnScratch" onclick="Games.scratch()">Play Now</button>
-    </div>
-    <!-- Slot -->
-    <div class="game-card" id="slotCard">
-      <div class="gc-icon">🎲</div>
-      <h3>Slot Machine</h3>
-      <p>Match 3 symbols to win!</p>
-      <div id="slotCd" class="cd-badge"></div>
-      <div class="slot-display">
-        <div class="slot-reel" id="sr1">🍎</div>
-        <div class="slot-reel" id="sr2">🍊</div>
-        <div class="slot-reel" id="sr3">🍋</div>
+      <h3>Spin Wheel</h3>
+      <div class="spin-wrap">
+        <div id="wheel"></div>
+        <div class="spin-pointer">▼</div>
       </div>
-      <button class="btn-game" id="btnSlot" onclick="Games.slot()">Pull!</button>
+      <div id="spinCd" class="cd-badge"></div>
+      <button class="btn-game" id="btnSpin" onclick="Games.spin()">Spin</button>
     </div>
-    <!-- Daily Wheel (FREE) -->
-    <div class="game-card" id="dailyWheelCard" style="border-color:rgba(255,215,0,0.3);padding-bottom:14px">
+    <!-- Daily Wheel -->
+    <div class="game-card" style="border-color:rgba(251,191,36,.4)">
       <div class="gc-icon">🎡</div>
-      <h3>Daily Bonus Wheel</h3>
-      <p>One FREE spin every day!</p>
-      <div style="position:relative;width:180px;height:180px;margin:10px auto">
-        <canvas id="dailyWheelEl" width="180" height="180" style="border-radius:50%;display:block"></canvas>
-        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-60%);font-size:1.5rem;pointer-events:none">▼</div>
+      <h3>Daily Bonus</h3>
+      <p>One FREE spin daily!</p>
+      <div class="wheel-wrap">
+        <canvas id="dailyWheelEl" width="160" height="160" style="border-radius:50%;display:block"></canvas>
+        <div class="wheel-pointer">▼</div>
       </div>
       <div id="dailyWheelCd" class="cd-badge"></div>
-      <button class="btn-game" id="dailySpinBtn" onclick="WheelSys.spin()" style="background:linear-gradient(135deg,#ffd700,#ff8c00);color:#000;margin-top:8px">🎡 FREE Spin!</button>
+      <button class="btn-game" id="dailySpinBtn" onclick="WheelSys.spin()" style="background:linear-gradient(135deg,#ffd700,#ff8c00);color:#000">FREE Spin!</button>
+    </div>
+    <!-- Scratch Card -->
+    <div class="game-card" style="border-color:rgba(52,211,153,.4)">
+      <div class="gc-icon">🎴</div>
+      <h3>Scratch Card</h3>
+      <div class="scratch-card" id="scratchCard" onclick="Games.scratch(this)">
+        <div style="text-align:center;color:#888"><i class="fas fa-ticket-alt" style="font-size:2rem;display:block;margin-bottom:6px"></i><small id="scratchCostText">Tap to Scratch</small></div>
+      </div>
+      <div id="scratchCd" class="cd-badge"></div>
+    </div>
+    <!-- Slot Machine -->
+    <div class="game-card" style="border-color:rgba(239,68,68,.4)">
+      <div class="gc-icon">🎲</div>
+      <h3>Slot Machine</h3>
+      <div class="slot-machine">
+        <div class="slot-reel" id="s1">🍋</div>
+        <div class="slot-reel" id="s2">🍒</div>
+        <div class="slot-reel" id="s3">💎</div>
+      </div>
+      <div id="slotCd" class="cd-badge"></div>
+      <button class="btn-game" id="btnSlot" onclick="Games.slot()">Play</button>
     </div>
   </div>
-  <div style="height:90px"></div>
 </div>
 
-<!-- ============ LEADERBOARD PAGE ============ -->
+<!-- ========== LEADERBOARD ========== -->
 <div id="page-leaderboard" class="page-section hidden">
   <div class="page-header-bar">
-    <h2><i class="fas fa-trophy" style="color:#ffd700"></i> Leaderboard</h2>
+    <h2><i class="fas fa-trophy" style="color:var(--gold)"></i> Leaderboard</h2>
   </div>
   <div class="lb-tabs">
     <button class="lb-tab active" onclick="LbSys.show('coins',this)">💰 Coins</button>
@@ -308,93 +288,79 @@
     <button class="lb-tab" onclick="LbSys.show('creators',this)">🎬 Creators</button>
     <button class="lb-tab" onclick="LbSys.show('referrals',this)">🤝 Referrals</button>
   </div>
-  <div class="lb-period">
+  <div class="lb-periods">
     <button class="lb-period-btn active" onclick="LbSys.period('all',this)">All Time</button>
     <button class="lb-period-btn" onclick="LbSys.period('week',this)">This Week</button>
     <button class="lb-period-btn" onclick="LbSys.period('month',this)">This Month</button>
   </div>
   <div id="myRankCard" class="my-rank-card hidden"></div>
   <div id="lbList" class="lb-list"></div>
-  <div style="height:90px"></div>
 </div>
 
-<!-- ============ REFERRAL PAGE ============ -->
+<!-- ========== REFERRAL ========== -->
 <div id="page-referral" class="page-section hidden">
   <div class="page-header-bar">
-    <h2><i class="fas fa-users" style="color:#34d399"></i> Referral Program</h2>
+    <h2><i class="fas fa-users" style="color:var(--cyan)"></i> Referrals</h2>
   </div>
-  <div class="ref-hero glass-card">
-    <div class="ref-code-wrap">
-      <p style="color:#888;font-size:0.82rem;margin-bottom:6px">Your Referral Code</p>
-      <div class="ref-code-box">
-        <span id="refCode" style="font-size:1.4rem;font-weight:900;letter-spacing:4px;color:white">------</span>
-        <button onclick="UI.copyRef()" class="copy-btn"><i class="fas fa-copy"></i></button>
-      </div>
+  <div class="ref-code-box">
+    <p style="color:var(--text2);font-size:.82rem;margin-bottom:6px">Your Referral Code</p>
+    <div class="ref-code" id="myRefCode">---</div>
+    <div class="ref-btn-row">
+      <button class="btn-g btn-sm" onclick="UI.copyRef()"><i class="fas fa-copy"></i> Copy</button>
+      <button class="btn-primary btn-sm" onclick="UI.shareRef()" style="width:auto;padding:6px 16px"><i class="fas fa-share"></i> Share</button>
     </div>
-    <div class="ref-stats-row">
-      <div class="ref-stat"><b id="refTotal">0</b><small>Total Refs</small></div>
-      <div class="ref-stat"><b id="refPending">0</b><small>Pending</small></div>
-      <div class="ref-stat"><b id="refEarned">0</b><small>Coins Earned</small></div>
-    </div>
-    <button class="btn-primary" onclick="UI.shareRef()"><i class="fas fa-share-alt"></i> Share Link</button>
   </div>
-  <div class="section-head">Referred Users</div>
+  <div class="ref-stats-row" id="refStats"></div>
+  <div class="section-head">Referral History</div>
   <div id="refList" style="padding:0 14px 90px"></div>
 </div>
 
-<!-- ============ PROFILE PAGE ============ -->
+<!-- ========== PROFILE ========== -->
 <div id="page-profile" class="page-section hidden">
   <div class="profile-hero">
     <button class="back-btn" onclick="Router.back()"><i class="fas fa-arrow-left"></i></button>
     <div class="profile-av-wrap">
-      <img id="profAvImg" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="profile-av">
-      <button class="av-edit-btn" onclick="Profile.uploadPic()"><i class="fas fa-camera"></i></button>
+      <img id="profAvImg" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="profile-av u-avatar">
+      <button class="av-edit-btn" onclick="document.getElementById('profPicFile').click()"><i class="fas fa-camera"></i></button>
       <input type="file" id="profPicFile" accept="image/*" style="display:none" onchange="Profile.uploadPicFile(this)">
     </div>
     <div id="profName" class="profile-name">Username</div>
     <div id="profBio" class="profile-bio"></div>
-    <div class="profile-badge-row" id="profBadges"></div>
     <div class="profile-stats-row">
-      <div class="ps-item"><b id="psCoin">0</b><small>Coins</small></div>
-      <div class="ps-item"><b id="psBal">৳0</b><small>Balance</small></div>
+      <div class="ps-item"><b class="u-coins" id="psCoin">0</b><small>Coins</small></div>
+      <div class="ps-item"><b class="u-bal" id="psBal">৳0</b><small>BDT</small></div>
       <div class="ps-item"><b id="psLevel">Lv1</b><small>Level</small></div>
       <div class="ps-item" onclick="Router.go('videos')"><b id="psVideos">0</b><small>Videos</small></div>
     </div>
   </div>
-
   <div style="padding:0 14px">
     <!-- Edit Profile -->
     <div class="glass-card" style="margin-bottom:14px">
       <h3 style="margin-bottom:12px"><i class="fas fa-edit" style="color:var(--primary)"></i> Edit Profile</h3>
       <div class="inp-group"><i class="fas fa-signature"></i><input id="editName" placeholder="Display Name"></div>
       <div class="inp-group"><i class="fas fa-quote-left"></i><input id="editBio" placeholder="Bio (optional)"></div>
-      <div class="inp-group"><i class="fas fa-lock"></i><input id="editCurPass" type="password" placeholder="Current Password"></div>
-      <div class="inp-group"><i class="fas fa-lock"></i><input id="editNewPass" type="password" placeholder="New Password (optional)"></div>
-      <div class="inp-group"><i class="fas fa-lock"></i><input id="editConfPass" type="password" placeholder="Confirm New Password"></div>
+      <div class="inp-group"><i class="fas fa-lock"></i><input id="editCurPass" type="password" placeholder="Current Password"><button onclick="togglePass('editCurPass',this)" style="background:none;border:none;color:#666;cursor:pointer"><i class="fas fa-eye"></i></button></div>
+      <div class="inp-group"><i class="fas fa-key"></i><input id="editNewPass" type="password" placeholder="New Password (optional)"><button onclick="togglePass('editNewPass',this)" style="background:none;border:none;color:#666;cursor:pointer"><i class="fas fa-eye"></i></button></div>
+      <div class="inp-group"><i class="fas fa-key"></i><input id="editConfPass" type="password" placeholder="Confirm New Password"></div>
       <button class="btn-primary" onclick="Profile.saveChanges()"><i class="fas fa-save"></i> Save Changes</button>
     </div>
-
-    <!-- Avatar Picker -->
+    <!-- Avatar -->
     <div class="glass-card" style="margin-bottom:14px">
-      <h3 style="margin-bottom:10px"><i class="fas fa-smile" style="color:#f59e0b"></i> Choose Avatar</h3>
+      <h3 style="margin-bottom:10px"><i class="fas fa-smile" style="color:var(--gold)"></i> Choose Avatar</h3>
       <div class="avatar-grid" id="avatarGrid"></div>
     </div>
-
-    <!-- App Settings -->
+    <!-- Settings -->
     <div class="glass-card" style="margin-bottom:14px">
       <h3 style="margin-bottom:12px"><i class="fas fa-cog" style="color:#64748b"></i> Settings</h3>
-
-      <!-- Theme Selector -->
       <div style="margin-bottom:12px">
         <div class="sr-title" style="margin-bottom:8px">🎨 App Theme</div>
         <div class="theme-grid">
-          <button class="theme-btn active" id="theme-dark"   onclick="ThemeSys.apply('dark')">🌑 Dark</button>
-          <button class="theme-btn"        id="theme-purple" onclick="ThemeSys.apply('purple')">💜 Purple</button>
-          <button class="theme-btn"        id="theme-ocean"  onclick="ThemeSys.apply('ocean')">🌊 Ocean</button>
-          <button class="theme-btn"        id="theme-amoled" onclick="ThemeSys.apply('amoled')">⬛ AMOLED</button>
+          <button class="theme-btn active" id="theme-dark" onclick="ThemeSys.apply('dark')">🌑 Dark</button>
+          <button class="theme-btn" id="theme-purple" onclick="ThemeSys.apply('purple')">💜 Purple</button>
+          <button class="theme-btn" id="theme-ocean" onclick="ThemeSys.apply('ocean')">🌊 Ocean</button>
+          <button class="theme-btn" id="theme-amoled" onclick="ThemeSys.apply('amoled')">⬛ AMOLED</button>
         </div>
       </div>
-
       <div class="settings-row" onclick="PWA.requestNotifPermission()">
         <div><div class="sr-title">🔔 Push Notifications</div><div class="sr-sub" id="notifStatusLabel">Tap to enable</div></div>
         <i class="fas fa-chevron-right" style="color:#555"></i>
@@ -408,424 +374,387 @@
         <i class="fas fa-chevron-right" style="color:#555"></i>
       </div>
     </div>
-
-    <!-- Channel / My Videos -->
+    <!-- My Channel -->
     <div class="glass-card" style="margin-bottom:14px">
       <h3 style="margin-bottom:10px"><i class="fas fa-tv" style="color:#8b5cf6"></i> My Channel</h3>
-      <button class="btn-secondary" onclick="Profile.myChannel()" style="width:100%"><i class="fas fa-tv"></i> Open My Channel</button>
+      <button class="btn-secondary" onclick="Profile.myChannel()"><i class="fas fa-tv"></i> Open My Channel</button>
     </div>
-
     <button class="btn-danger" onclick="Auth.logout()" style="width:100%;margin-bottom:14px"><i class="fas fa-sign-out-alt"></i> Logout</button>
     <div style="height:90px"></div>
   </div>
 </div>
 
-<!-- ============ WITHDRAW PAGE ============ -->
+<!-- ========== WITHDRAW ========== -->
 <div id="page-withdraw" class="page-section hidden">
   <div class="page-header-bar">
-    <h2><i class="fas fa-wallet" style="color:#10b981"></i> Withdraw</h2>
+    <h2><i class="fas fa-wallet" style="color:var(--green)"></i> Withdraw</h2>
   </div>
-  <div style="padding:0 14px">
-
-    <!-- Balance Cards -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
-      <div class="glass-card" style="text-align:center;padding:14px">
-        <div style="font-size:1.5rem;margin-bottom:4px">🇧🇩</div>
-        <div style="font-size:1.3rem;font-weight:800;color:#10b981" class="u-bal">৳0.00</div>
-        <div style="font-size:0.72rem;color:#888;margin-top:2px">BDT Balance</div>
+  <div style="padding:14px">
+    <!-- Balance cards -->
+    <div class="bal-cards">
+      <div class="bal-card">
+        <div class="flag">🇧🇩</div>
+        <span class="amount u-bal" style="color:var(--green)">৳0.00</span>
+        <small>BDT Balance</small>
       </div>
-      <div class="glass-card" style="text-align:center;padding:14px">
-        <div style="font-size:1.5rem;margin-bottom:4px">🇺🇸</div>
-        <div style="font-size:1.3rem;font-weight:800;color:#3b82f6" class="u-bal-usd">$0.0000</div>
-        <div style="font-size:0.72rem;color:#888;margin-top:2px">USD Balance</div>
+      <div class="bal-card">
+        <div class="flag">🇺🇸</div>
+        <span class="amount u-bal-usd" style="color:#3b82f6">$0.0000</span>
+        <small>USD Balance</small>
       </div>
     </div>
-
     <!-- Not monetized lock -->
-    <div id="wdLock" class="hidden"></div>
-
-    <!-- Withdraw Form -->
+    <div id="wdLock" class="hidden" style="text-align:center;padding:30px;color:var(--text2)">
+      <i class="fas fa-lock" style="font-size:2.5rem;display:block;margin-bottom:12px;color:var(--primary)"></i>
+      <b>Monetization Required</b>
+      <p style="font-size:.82rem;margin-top:8px">Reach 10,000,000 coins to unlock withdrawals</p>
+      <button onclick="VidSys.tab('monetize');Router.go('videos')" class="btn-primary btn-sm" style="width:auto;margin-top:12px;padding:8px 20px">Go to Monetize</button>
+    </div>
+    <!-- Withdraw form -->
     <div id="wdForm" class="hidden">
-
-      <!-- Currency Toggle -->
-      <div class="glass-card" style="margin-bottom:12px">
-        <h3 style="margin-bottom:12px">💸 Bank Transfer Request</h3>
-        <div style="display:flex;gap:8px;margin-bottom:14px">
-          <button id="wCurrBKash" onclick="WD.setCurr('bKash',this)" class="curr-btn">📱 bKash</button>
-          <button id="wCurrBDT" onclick="WD.setCurr('BDT',this)" class="curr-btn">🇧🇩 BDT</button>
-          <button id="wCurrUSD" onclick="WD.setCurr('USD',this)" class="curr-btn">🇺🇸 USD</button>
-        </div>
-
-
-        <!-- bKash Form -->
-        <div id="wFormBKash" style="display:none">
-          <div style="background:rgba(232,0,120,0.06);border:1px solid rgba(232,0,120,0.25);border-radius:10px;padding:10px;margin-bottom:12px;font-size:0.8rem;color:#888;line-height:1.7">
-            📱 <b style="color:#e80078">bKash Transfer</b><br>
-            • Minimum: ৳200<br>
-            • Processing: Within 24 hours<br>
-            • Personal bKash account only
-          </div>
-          <div class="inp-group"><i class="fas fa-bangladeshi-taka-sign" style="color:#e80078"></i><input id="wAmtBKash" type="number" placeholder="Amount in BDT (min ৳200)"></div>
-          <div class="inp-group"><i class="fas fa-phone" style="color:#e80078"></i><input id="wBKashNumber" placeholder="bKash account number (01XXXXXXXXX)"></div>
-          <div class="inp-group"><i class="fas fa-user" style="color:#e80078"></i><input id="wBKashHolder" placeholder="Account holder name"></div>
-          <button class="btn-primary" style="background:linear-gradient(135deg,#b8005a,#e80078)" onclick="WD.submit('bKash')"><i class="fas fa-paper-plane"></i> Submit bKash Request</button>
-        </div>
-        <!-- BDT Form -->
-        <div id="wFormBDT">
-          <div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.2);border-radius:10px;padding:10px;margin-bottom:12px;font-size:0.8rem;color:#888;line-height:1.7">
-            🏦 <b style="color:#10b981">BDT Bank Transfer</b><br>
-            • Minimum: ৳500<br>
-            • Processing: 3–5 business days<br>
-            • Bank account must be in your name
-          </div>
-          <div class="inp-group"><i class="fas fa-bangladeshi-taka-sign" style="color:#10b981"></i><input id="wAmtBDT" type="number" placeholder="Amount in BDT (min ৳500)"></div>
-          <div class="inp-group"><i class="fas fa-university" style="color:#10b981"></i><input id="wBankName" placeholder="Bank name (e.g. Dutch-Bangla)"></div>
-          <div class="inp-group"><i class="fas fa-credit-card" style="color:#10b981"></i><input id="wBankAcc" placeholder="Bank account number"></div>
-          <div class="inp-group"><i class="fas fa-code-branch" style="color:#10b981"></i><input id="wBranchName" placeholder="Branch name"></div>
-          <div class="inp-group"><i class="fas fa-id-card" style="color:#10b981"></i><input id="wAccHolder" placeholder="Account holder name"></div>
-          <button class="btn-primary" style="background:linear-gradient(135deg,#059669,#10b981)" onclick="WD.submit('BDT')"><i class="fas fa-paper-plane"></i> Submit BDT Request</button>
-        </div>
-
-        <!-- USD Form -->
-        <div id="wFormUSD" style="display:none">
-          <div style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.2);border-radius:10px;padding:10px;margin-bottom:12px;font-size:0.8rem;color:#888;line-height:1.7">
-            🏦 <b style="color:#3b82f6">USD Bank Transfer (SWIFT/Wire)</b><br>
-            • Minimum: $5.00<br>
-            • Processing: 5–7 business days<br>
-            • International bank account required
-          </div>
-          <div class="inp-group"><i class="fas fa-dollar-sign" style="color:#3b82f6"></i><input id="wAmtUSD" type="number" step="0.01" placeholder="Amount in USD (min $5.00)"></div>
-          <div class="inp-group"><i class="fas fa-university" style="color:#3b82f6"></i><input id="wBankNameUSD" placeholder="Bank name"></div>
-          <div class="inp-group"><i class="fas fa-credit-card" style="color:#3b82f6"></i><input id="wBankAccUSD" placeholder="IBAN / Account number"></div>
-          <div class="inp-group"><i class="fas fa-globe" style="color:#3b82f6"></i><input id="wSwiftCode" placeholder="SWIFT / BIC code"></div>
-          <div class="inp-group"><i class="fas fa-map-marker-alt" style="color:#3b82f6"></i><input id="wBankCountry" placeholder="Bank country"></div>
-          <div class="inp-group"><i class="fas fa-id-card" style="color:#3b82f6"></i><input id="wAccHolderUSD" placeholder="Account holder name"></div>
-          <button class="btn-primary" style="background:linear-gradient(135deg,#1d4ed8,#3b82f6)" onclick="WD.submit('USD')"><i class="fas fa-paper-plane"></i> Submit USD Request</button>
-        </div>
+      <!-- Currency tabs -->
+      <div class="curr-tabs">
+        <button id="wCurrBKash" class="curr-btn active" onclick="WD.setCurr('bKash',this)">📱 bKash</button>
+        <button id="wCurrBDT" class="curr-btn" onclick="WD.setCurr('BDT',this)">🇧🇩 BDT Bank</button>
+        <button id="wCurrUSD" class="curr-btn" onclick="WD.setCurr('USD',this)">🇺🇸 USD Bank</button>
       </div>
-
-      <!-- Rate Info -->
-      <div class="glass-card" style="margin-bottom:14px">
-        <h4 style="margin-bottom:8px;font-size:0.88rem">💱 Exchange Rate</h4>
-        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.06);font-size:0.82rem">
-          <span style="color:#888">1 Coin → BDT</span>
-          <span id="rateShowBDT" style="color:#10b981;font-weight:700">৳0.05</span>
+      <!-- bKash form -->
+      <div id="wFormBKash" class="card">
+        <h4 style="margin-bottom:12px;color:var(--pink)">📱 bKash Transfer</h4>
+        <div style="background:rgba(232,0,120,.06);border:1px solid rgba(232,0,120,.2);border-radius:10px;padding:10px;margin-bottom:12px;font-size:.8rem;color:#888;line-height:1.7">
+          • Minimum: ৳200 • Processing: Within 24 hours • Personal bKash account only
         </div>
-        <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:0.82rem">
-          <span style="color:#888">1 Coin → USD</span>
-          <span id="rateShowUSD" style="color:#3b82f6;font-weight:700">$0.0005</span>
+        <div class="inp-group"><i class="fas fa-phone" style="color:var(--pink)"></i><input id="wBKashNumber" placeholder="bKash number (01XXXXXXXXX)" type="tel"></div>
+        <div class="inp-group"><i class="fas fa-user" style="color:var(--pink)"></i><input id="wBKashHolder" placeholder="Account holder name"></div>
+        <div class="inp-group"><i class="fas fa-coins" style="color:var(--pink)"></i><input id="wAmtBKash" type="number" placeholder="Amount in BDT (min ৳200)"></div>
+        <button class="btn-primary" style="background:linear-gradient(135deg,#b8005a,#e80078)" onclick="WD.submit('bKash')"><i class="fas fa-paper-plane"></i> Submit bKash Request</button>
+      </div>
+      <!-- BDT Bank form -->
+      <div id="wFormBDT" class="card hidden">
+        <h4 style="margin-bottom:12px;color:var(--green)">🇧🇩 BDT Bank Transfer</h4>
+        <div style="background:rgba(52,211,153,.06);border:1px solid rgba(52,211,153,.2);border-radius:10px;padding:10px;margin-bottom:12px;font-size:.8rem;color:#888;line-height:1.7">
+          • Minimum: ৳500 • Processing: 3–5 business days • Account must be in your name
         </div>
+        <div class="inp-group"><i class="fas fa-university" style="color:var(--green)"></i><input id="wBankName" placeholder="Bank name (e.g. Dutch-Bangla)"></div>
+        <div class="inp-group"><i class="fas fa-credit-card" style="color:var(--green)"></i><input id="wBankAcc" placeholder="Account number"></div>
+        <div class="inp-group"><i class="fas fa-code-branch" style="color:var(--green)"></i><input id="wBranchName" placeholder="Branch name"></div>
+        <div class="inp-group"><i class="fas fa-user" style="color:var(--green)"></i><input id="wAccHolder" placeholder="Account holder name"></div>
+        <div class="inp-group"><i class="fas fa-coins" style="color:var(--green)"></i><input id="wAmtBDT" type="number" placeholder="Amount in BDT (min ৳500)"></div>
+        <button class="btn-primary" style="background:linear-gradient(135deg,#059669,#10b981)" onclick="WD.submit('BDT')"><i class="fas fa-paper-plane"></i> Submit BDT Request</button>
+      </div>
+      <!-- USD Bank form -->
+      <div id="wFormUSD" class="card hidden">
+        <h4 style="margin-bottom:12px;color:#3b82f6">🇺🇸 USD Bank Transfer (SWIFT)</h4>
+        <div style="background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.2);border-radius:10px;padding:10px;margin-bottom:12px;font-size:.8rem;color:#888;line-height:1.7">
+          • Minimum: $5.00 • Processing: 5–7 business days • International account required
+        </div>
+        <div class="inp-group"><i class="fas fa-university" style="color:#3b82f6"></i><input id="wBankNameUSD" placeholder="Bank name"></div>
+        <div class="inp-group"><i class="fas fa-credit-card" style="color:#3b82f6"></i><input id="wBankAccUSD" placeholder="IBAN / Account number"></div>
+        <div class="inp-group"><i class="fas fa-globe" style="color:#3b82f6"></i><input id="wSwiftCode" placeholder="SWIFT / BIC code"></div>
+        <div class="inp-group"><i class="fas fa-map-marker-alt" style="color:#3b82f6"></i><input id="wBankCountry" placeholder="Bank country"></div>
+        <div class="inp-group"><i class="fas fa-user" style="color:#3b82f6"></i><input id="wAccHolderUSD" placeholder="Account holder name"></div>
+        <div class="inp-group"><i class="fas fa-dollar-sign" style="color:#3b82f6"></i><input id="wAmtUSD" type="number" step="0.01" placeholder="Amount in USD (min $5.00)"></div>
+        <button class="btn-primary" style="background:linear-gradient(135deg,#1d4ed8,#3b82f6)" onclick="WD.submit('USD')"><i class="fas fa-paper-plane"></i> Submit USD Request</button>
+      </div>
+      <!-- Exchange rates -->
+      <div class="card">
+        <h4 style="margin-bottom:10px;font-size:.88rem">💱 Exchange Rates</h4>
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:.82rem"><span style="color:var(--text2)">1 Coin → BDT</span><span id="rateShowBDT" style="color:var(--green);font-weight:700">৳0.05</span></div>
+        <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:.82rem"><span style="color:var(--text2)">1 Coin → USD</span><span id="rateShowUSD" style="color:#3b82f6;font-weight:700">$0.0005</span></div>
       </div>
     </div>
-
+    <!-- History -->
     <div class="section-head">Transaction History</div>
     <div id="wdList" style="padding-bottom:90px"></div>
   </div>
 </div>
 
-<!-- ============ CHANNEL PAGE ============ -->
+<!-- ========== CHANNEL ========== -->
 <div id="page-channel" class="page-section hidden">
-  <div id="chEditBar" class="hidden ch-edit-bar">
+  <div id="chEditBar" class="ch-edit-bar hidden">
     <h4 style="margin-bottom:10px"><i class="fas fa-edit" style="color:var(--primary)"></i> Edit Channel</h4>
     <div class="inp-group"><i class="fas fa-align-left"></i><input id="chDescIn" placeholder="Channel description"></div>
     <div class="inp-group"><i class="fas fa-image"></i><input id="chBannerIn" placeholder="Banner image URL"></div>
     <div class="inp-group"><i class="fas fa-link"></i><input id="chLinkIn" placeholder="Website / social link"></div>
-    <button class="btn-primary btn-sm" onclick="ChanSys.save()"><i class="fas fa-save"></i> Save</button>
+    <div style="display:flex;gap:8px">
+      <button class="btn-primary btn-sm" style="width:auto;padding:8px 16px" onclick="ChanSys.save()"><i class="fas fa-save"></i> Save</button>
+      <button class="btn-secondary btn-sm" style="width:auto;padding:8px 16px" onclick="Router.back()"><i class="fas fa-arrow-left"></i> Back</button>
+    </div>
   </div>
   <div id="chHeader"></div>
   <div class="ch-tab-bar" id="chTabs">
     <button class="vtab active" onclick="ChanSys.showTab('videos',this)">Videos</button>
     <button class="vtab" onclick="ChanSys.showTab('shorts',this)">Shorts</button>
     <button class="vtab" onclick="ChanSys.showTab('playlists',this)">Playlists</button>
-    <button class="vtab" onclick="ChanSys.showTab('community',this)">Community</button>
     <button class="vtab" onclick="ChanSys.showTab('about',this)">About</button>
   </div>
   <div id="chContent" style="padding:0 0 100px"></div>
 </div>
 
-<!-- ============ ADMIN PAGE ============ -->
-<div id="page-admin" class="page-section hidden admin-pg">
-  <div class="admin-header">
-    <h2><i class="fas fa-shield-alt"></i> Admin Panel</h2>
-    <button onclick="Admin.logout()" class="admin-logout"><i class="fas fa-sign-out-alt"></i></button>
-  </div>
-  <!-- Admin tab bar -->
-  <div class="admin-tabs" id="adminTabs">
-    <button class="atab active" onclick="Admin.tab('overview',this)"><i class="fas fa-chart-pie"></i> Overview</button>
-    <button class="atab" onclick="Admin.tab('users',this)"><i class="fas fa-users"></i> Users</button>
-    <button class="atab" onclick="Admin.tab('videos',this)"><i class="fas fa-video"></i> Videos</button>
-    <button class="atab" onclick="Admin.tab('tasks',this)"><i class="fas fa-tasks"></i> Tasks</button>
-    <button class="atab" onclick="Admin.tab('withdrawals',this)"><i class="fas fa-wallet"></i> Withdrawals</button>
-    <button class="atab" onclick="Admin.tab('monetize',this)"><i class="fas fa-coins"></i> Monetize</button>
-    <button class="atab" onclick="Admin.tab('push',this)"><i class="fas fa-bell"></i> Push</button>
-    <button class="atab" onclick="Admin.tab('config',this)"><i class="fas fa-cog"></i> Config</button>
-  </div>
-
-  <!-- Overview -->
-  <div id="aTab-overview" class="atab-content">
-    <div class="admin-stats-grid" id="adminStatsGrid"></div>
-    <div class="card" style="margin:14px"><canvas id="adminChart" height="160"></canvas></div>
-  </div>
-
-  <!-- Users -->
-  <div id="aTab-users" class="atab-content hidden">
-    <div style="padding:14px">
-      <div class="inp-group"><i class="fas fa-search"></i><input id="userSearch" placeholder="Search users..." oninput="Admin.searchUsers(this.value)"></div>
+<!-- ========== ADMIN ========== -->
+<div id="page-admin" class="page-section admin-pg hidden">
+  <div id="agate">
+    <div style="padding:30px;text-align:center">
+      <i class="fas fa-shield-alt" style="font-size:3rem;color:var(--primary);display:block;margin-bottom:14px"></i>
+      <h2 style="margin-bottom:16px">Admin Login</h2>
+      <div class="inp-group"><i class="fas fa-key"></i><input id="adminPin2" type="password" placeholder="Enter admin PIN"></div>
+      <button class="btn-primary" onclick="Auth.adminLogin2()">Enter Panel</button>
     </div>
-    <div id="aUserList" style="padding:0 14px 20px"></div>
   </div>
-
-  <!-- Videos -->
-  <div id="aTab-videos" class="atab-content hidden">
-    <div style="padding:14px">
-      <div class="card" style="margin:0 0 14px">
-        <h3 style="margin-bottom:10px">➕ Add YouTube Video</h3>
-        <div class="inp-group"><i class="fas fa-heading"></i><input id="vTitle" placeholder="Video Title"></div>
-        <div class="inp-group"><i class="fab fa-youtube" style="color:red"></i><input id="vUrl" placeholder="YouTube URL or Video ID"></div>
-        <div class="inp-group"><i class="fas fa-align-left"></i><input id="vDesc" placeholder="Description (optional)"></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-          <div><label class="flbl">Watch Time (sec)</label><input id="vDur" type="number" placeholder="30" style="margin:0"></div>
-          <div><label class="flbl">Category</label>
-            <select id="vCat" style="margin:0;background:#1a1a2e;color:white;border:1px solid #333;border-radius:8px;padding:10px;width:100%">
-              <option value="Education">📚 Education</option><option value="Entertainment">🎭 Entertainment</option>
-              <option value="Music">🎵 Music</option><option value="Technology">💻 Technology</option>
-              <option value="Sports">⚽ Sports</option><option value="Gaming">🎮 Gaming</option>
-              <option value="Shorts">⚡ Shorts</option><option value="Other">🎬 Other</option>
-            </select>
+  <div id="adminPanel" class="hidden">
+    <div class="admin-header">
+      <h2><i class="fas fa-shield-alt" style="color:var(--primary)"></i> Admin Panel</h2>
+      <button onclick="Admin.logout()" class="admin-logout"><i class="fas fa-sign-out-alt"></i></button>
+    </div>
+    <div class="admin-tabs">
+      <button class="atab active" onclick="Admin.tab('overview',this)"><i class="fas fa-chart-pie"></i>Overview</button>
+      <button class="atab" onclick="Admin.tab('users',this)"><i class="fas fa-users"></i>Users</button>
+      <button class="atab" onclick="Admin.tab('videos',this)"><i class="fas fa-video"></i>Videos</button>
+      <button class="atab" onclick="Admin.tab('tasks',this)"><i class="fas fa-tasks"></i>Tasks</button>
+      <button class="atab" onclick="Admin.tab('withdrawals',this)"><i class="fas fa-wallet"></i>Withdrawals</button>
+      <button class="atab" onclick="Admin.tab('monetize',this)"><i class="fas fa-coins"></i>Monetize</button>
+      <button class="atab" onclick="Admin.tab('push',this)"><i class="fas fa-bell"></i>Push</button>
+      <button class="atab" onclick="Admin.tab('config',this)"><i class="fas fa-cog"></i>Config</button>
+    </div>
+    <!-- Overview -->
+    <div id="aTab-overview" class="atab-content">
+      <div class="admin-stats-grid" id="adminStatsGrid"></div>
+    </div>
+    <!-- Users -->
+    <div id="aTab-users" class="atab-content hidden">
+      <div style="padding:14px">
+        <div class="inp-group"><i class="fas fa-search"></i><input id="userSearch" placeholder="Search by username or mobile..." oninput="Admin.searchUsers(this.value)"></div>
+      </div>
+      <div id="aUserList" style="padding:0 14px 20px"></div>
+    </div>
+    <!-- Videos -->
+    <div id="aTab-videos" class="atab-content hidden">
+      <div style="padding:14px">
+        <div class="card" style="margin:0 0 14px">
+          <h3 style="margin-bottom:10px">➕ Add YouTube Video</h3>
+          <div class="inp-group"><i class="fas fa-heading"></i><input id="vTitle" placeholder="Video Title"></div>
+          <div class="inp-group"><i class="fab fa-youtube" style="color:red"></i><input id="vUrl" placeholder="YouTube URL or Video ID"></div>
+          <div class="inp-group"><i class="fas fa-align-left"></i><input id="vDesc" placeholder="Description (optional)"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+            <div><label class="flbl">Watch Time (sec)</label><input id="vDur" type="number" placeholder="30"></div>
+            <div><label class="flbl">Category</label>
+              <select id="vCat" style="margin:0;background:var(--bg2);color:white;border:1px solid var(--border);border-radius:8px;padding:10px;width:100%">
+                <option value="Education">📚 Education</option><option value="Entertainment">🎭 Entertainment</option>
+                <option value="Music">🎵 Music</option><option value="Technology">💻 Technology</option>
+                <option value="Sports">⚽ Sports</option><option value="Gaming">🎮 Gaming</option>
+                <option value="Shorts">⚡ Shorts</option><option value="Other">🎬 Other</option>
+              </select>
+            </div>
           </div>
+          <div class="inp-group"><i class="fas fa-image"></i><input id="vThumb" placeholder="Custom thumbnail URL (optional)"></div>
+          <button class="btn-primary" onclick="Admin.addVid()"><i class="fas fa-plus"></i> Add Video</button>
         </div>
-        <div class="inp-group"><i class="fas fa-image"></i><input id="vThumb" placeholder="Custom thumbnail URL (optional)"></div>
-        <button class="btn-primary" onclick="Admin.addVid()"><i class="fas fa-plus"></i> Add Video</button>
+        <p id="aVidCnt" style="color:var(--text2);font-size:.82rem;margin-bottom:8px"></p>
+        <div id="aVidList"></div>
       </div>
-      <p id="aVidCnt" style="color:#888;font-size:0.82rem;margin-bottom:8px"></p>
-      <div id="aVidList"></div>
     </div>
-  </div>
-
-  <!-- Tasks -->
-  <div id="aTab-tasks" class="atab-content hidden">
-    <div style="padding:14px">
-      <div class="card" style="margin:0 0 14px">
-        <h3 style="margin-bottom:10px">➕ Add Task</h3>
-        <div class="inp-group"><i class="fas fa-heading"></i><input id="tTitle" placeholder="Task Title"></div>
-        <div class="inp-group"><i class="fas fa-align-left"></i><input id="tDesc" placeholder="Description"></div>
-        <div class="inp-group"><i class="fas fa-link"></i><input id="tUrl" placeholder="Task URL"></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <div class="inp-group" style="margin:0"><i class="fas fa-coins"></i><input id="tReward" type="number" placeholder="Reward coins"></div>
-          <div class="inp-group" style="margin:0"><i class="fas fa-clock"></i><input id="tTime" type="number" placeholder="Timer (sec)"></div>
+    <!-- Tasks -->
+    <div id="aTab-tasks" class="atab-content hidden">
+      <div style="padding:14px">
+        <div class="card" style="margin:0 0 14px">
+          <h3 style="margin-bottom:10px">➕ Add Task</h3>
+          <div class="inp-group"><i class="fas fa-heading"></i><input id="tTitle" placeholder="Task Title"></div>
+          <div class="inp-group"><i class="fas fa-align-left"></i><input id="tDesc" placeholder="Description"></div>
+          <div class="inp-group"><i class="fas fa-link"></i><input id="tUrl" placeholder="Task URL"></div>
+          <div class="inp-group"><i class="fas fa-image"></i><input id="tIcon" placeholder="Icon URL (optional)"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div class="inp-group" style="margin:0"><i class="fas fa-coins"></i><input id="tReward" type="number" placeholder="Coins reward"></div>
+            <div class="inp-group" style="margin:0"><i class="fas fa-clock"></i><input id="tTime" type="number" placeholder="Timer (sec)"></div>
+          </div>
+          <br><button class="btn-primary" onclick="Admin.addTask()"><i class="fas fa-plus"></i> Add Task</button>
         </div>
-        <br><button class="btn-primary" onclick="Admin.addTask()"><i class="fas fa-plus"></i> Add Task</button>
+        <div id="aTaskList"></div>
       </div>
-      <div id="aTaskList"></div>
     </div>
-  </div>
-
-  <!-- Withdrawals -->
-  <div id="aTab-withdrawals" class="atab-content hidden">
-    <div style="padding:14px">
+    <!-- Withdrawals -->
+    <div id="aTab-withdrawals" class="atab-content hidden">
       <div class="admin-filter-row">
         <button class="afilter active" onclick="Admin.filterWD('pending',this)">⏳ Pending</button>
         <button class="afilter" onclick="Admin.filterWD('approved',this)">✅ Approved</button>
         <button class="afilter" onclick="Admin.filterWD('rejected',this)">❌ Rejected</button>
         <button class="afilter" onclick="Admin.filterWD('all',this)">All</button>
       </div>
-      <div id="aWDList"></div>
+      <div id="aWDList" style="padding:0 14px"></div>
     </div>
-  </div>
-
-  <!-- Monetize -->
-  <div id="aTab-monetize" class="atab-content hidden">
-    <div style="padding:14px"><div id="aMonList"></div></div>
-  </div>
-
-  <!-- Push Notifications -->
-  <div id="aTab-push" class="atab-content hidden">
-    <div style="padding:14px">
-      <div class="card">
-        <h3 style="margin-bottom:12px"><i class="fas fa-bell" style="color:#ffd700"></i> Send Push Notification</h3>
-        <div class="inp-group"><i class="fas fa-heading"></i><input id="pushTitle" placeholder="Notification Title"></div>
-        <div class="inp-group"><i class="fas fa-align-left"></i><textarea id="pushBody" placeholder="Message..." rows="3" style="flex:1;background:none;border:none;outline:none;color:white;font-size:0.9rem"></textarea></div>
-        <div class="inp-group"><i class="fas fa-link"></i><input id="pushUrl" placeholder="URL to open (optional)"></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
-          <button class="btn-primary" onclick="Admin.sendPushAll()"><i class="fas fa-broadcast-tower"></i> Send to All</button>
-          <button class="btn-secondary" onclick="Admin.sendPushTest()"><i class="fas fa-flask"></i> Test to Me</button>
+    <!-- Monetize -->
+    <div id="aTab-monetize" class="atab-content hidden">
+      <div style="padding:14px"><div id="aMonList"></div></div>
+    </div>
+    <!-- Push -->
+    <div id="aTab-push" class="atab-content hidden">
+      <div style="padding:14px">
+        <div class="card">
+          <h3 style="margin-bottom:12px"><i class="fas fa-bell" style="color:var(--gold)"></i> Send Push Notification</h3>
+          <div class="inp-group"><i class="fas fa-heading"></i><input id="pushTitle" placeholder="Notification Title"></div>
+          <div class="inp-group"><i class="fas fa-align-left"></i><textarea id="pushBody" placeholder="Message..." rows="3" style="flex:1;background:none;border:none;outline:none;color:white;font-size:.9rem"></textarea></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+            <button class="btn-primary" onclick="Admin.sendPushAll()"><i class="fas fa-broadcast-tower"></i> Send to All</button>
+            <button class="btn-secondary" onclick="Admin.sendPushTest()"><i class="fas fa-flask"></i> Test to Me</button>
+          </div>
+          <div id="pushSentMsg" style="color:var(--green);font-size:.82rem;text-align:center"></div>
         </div>
-        <div id="pushSentMsg" style="color:#34d399;font-size:0.82rem;text-align:center"></div>
       </div>
     </div>
-  </div>
-
-  <!-- Config -->
-  <div id="aTab-config" class="atab-content hidden">
-    <div style="padding:14px">
-      <!-- Game Config -->
-      <div class="card" style="margin-bottom:12px">
-        <h3 style="margin-bottom:10px"><i class="fas fa-gamepad" style="color:#8b5cf6"></i> Game Config</h3>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <div><label class="flbl">Cooldown (hours)</label><input id="cfCooldown" type="number"></div>
-          <div><label class="flbl">Spin Cost</label><input id="cfSpin" type="number"></div>
-          <div><label class="flbl">Scratch Cost</label><input id="cfScratch" type="number"></div>
-          <div><label class="flbl">Slot Cost</label><input id="cfSlot" type="number"></div>
+    <!-- Config -->
+    <div id="aTab-config" class="atab-content hidden">
+      <div style="padding:14px">
+        <div class="card" style="margin-bottom:12px">
+          <h3 style="margin-bottom:10px"><i class="fas fa-gamepad" style="color:#8b5cf6"></i> Game Config</h3>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div><label class="flbl">Cooldown (hours)</label><input id="cfCooldown" type="number"></div>
+            <div><label class="flbl">Spin Cost</label><input id="cfSpin" type="number"></div>
+            <div><label class="flbl">Scratch Cost</label><input id="cfScratch" type="number"></div>
+            <div><label class="flbl">Slot Cost</label><input id="cfSlot" type="number"></div>
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:12px">
+          <h3 style="margin-bottom:10px"><i class="fas fa-money-bill" style="color:var(--green)"></i> Finance Config</h3>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div><label class="flbl">Min Withdraw (BDT)</label><input id="cfMinWD" type="number"></div>
+            <div><label class="flbl">Coin → BDT Rate</label><input id="cfRate" type="number" step="0.001"></div>
+            <div><label class="flbl">Referral Bonus</label><input id="cfRefBonus" type="number"></div>
+            <div><label class="flbl">Ref Tasks Required</label><input id="cfRefReq" type="number"></div>
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:12px">
+          <h3 style="margin-bottom:10px"><i class="fas fa-coins" style="color:var(--gold)"></i> Video Coin Config</h3>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div><label class="flbl">Creator coins/view</label><input id="viewRate" type="number" step="0.001"></div>
+            <div><label class="flbl">Viewer coins/watch</label><input id="viewerRate" type="number" step="0.001"></div>
+            <div><label class="flbl">Upload Bonus</label><input id="uploadBonus" type="number"></div>
+            <div><label class="flbl">Monetize (coins req.)</label><input id="monCoins" type="number"></div>
+          </div>
+          <br><button class="btn-primary btn-sm" style="width:auto;padding:8px 20px" onclick="Admin.saveVideoCoinCfg()"><i class="fas fa-save"></i> Save Video Config</button>
+        </div>
+        <div class="card" style="margin-bottom:12px">
+          <h3 style="margin-bottom:10px"><i class="fas fa-ad" style="color:var(--gold)"></i> Video Ad Config</h3>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+            <input type="checkbox" id="adEnabled" style="width:18px;height:18px">
+            <label style="color:#ddd;font-size:.9rem">Enable Video Ads</label>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+            <div><label class="flbl">Skip After (sec)</label><input id="adSkip" type="number"></div>
+            <div><label class="flbl">Show Every N videos</label><input id="adFreq" type="number"></div>
+          </div>
+          <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+            <button id="adTypePreroll" class="atype-btn active" onclick="Admin.setAdType('preroll',this)">Pre-roll</button>
+            <button id="adTypeMidroll" class="atype-btn" onclick="Admin.setAdType('midroll',this)">Mid-roll</button>
+            <button id="adTypeBumper"  class="atype-btn" onclick="Admin.setAdType('bumper',this)">Bumper</button>
+            <button id="adTypeOverlay" class="atype-btn" onclick="Admin.setAdType('overlay',this)">Overlay</button>
+          </div>
+          <textarea id="adCode" style="width:100%;height:80px;background:#111;color:lime;border:1px solid var(--border);border-radius:8px;padding:10px;font-size:.78rem" placeholder="Paste ad HTML/script here..."></textarea>
+          <br><br><button class="btn-primary btn-sm" style="width:auto;padding:8px 20px" onclick="Admin.saveAds()"><i class="fas fa-save"></i> Save Ad Config</button>
+        </div>
+        <div class="card" style="margin-bottom:12px">
+          <h3 style="margin-bottom:8px"><i class="fas fa-home" style="color:var(--cyan)"></i> Home Banner Ad</h3>
+          <textarea id="cfHomeAd" style="width:100%;height:80px;background:#111;color:lime;border:1px solid var(--border);border-radius:8px;padding:10px;font-size:.78rem" placeholder="Home page banner ad code..."></textarea>
+        </div>
+        <div class="card" style="margin-bottom:12px">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div><h3>🔧 Maintenance Mode</h3><p style="color:var(--text2);font-size:.82rem">Prevents user login</p></div>
+            <input type="checkbox" id="cfMaint" style="width:22px;height:22px">
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:80px">
+          <button class="btn-primary" onclick="Admin.saveConfig()"><i class="fas fa-save"></i> Save All Config</button>
+          <button class="btn-o" onclick="Admin.export()"><i class="fas fa-download"></i> Export CSV</button>
         </div>
       </div>
-      <!-- Finance Config -->
-      <div class="card" style="margin-bottom:12px">
-        <h3 style="margin-bottom:10px"><i class="fas fa-money-bill" style="color:#10b981"></i> Finance Config</h3>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <div><label class="flbl">Min Withdraw (BDT)</label><input id="cfMinWD" type="number"></div>
-          <div><label class="flbl">Coin → BDT Rate</label><input id="cfRate" type="number" step="0.001"></div>
-          <div><label class="flbl">Referral Bonus</label><input id="cfRefBonus" type="number"></div>
-          <div><label class="flbl">Ref Tasks Required</label><input id="cfRefReq" type="number"></div>
-        </div>
-      </div>
-      <!-- Video Coin Config -->
-      <div class="card" style="margin-bottom:12px">
-        <h3 style="margin-bottom:10px"><i class="fas fa-coins" style="color:#ffd700"></i> Video Coin Config</h3>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <div><label class="flbl">Creator coins/view</label><input id="viewRate" type="number" step="0.001"></div>
-          <div><label class="flbl">Viewer coins/watch</label><input id="viewerRate" type="number" step="0.001"></div>
-          <div><label class="flbl">Upload Bonus</label><input id="uploadBonus" type="number"></div>
-          <div><label class="flbl">Monetize (coins req.)</label><input id="monCoins" type="number"></div>
-        </div>
-        <br><button class="btn-primary btn-sm" onclick="Admin.saveVideoCoinCfg()"><i class="fas fa-save"></i> Save</button>
-      </div>
-      <!-- Ad Config -->
-      <div class="card" style="margin-bottom:12px">
-        <h3 style="margin-bottom:10px"><i class="fas fa-ad" style="color:#f59e0b"></i> Video Ad Config</h3>
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-          <input type="checkbox" id="adEnabled" style="width:18px;height:18px">
-          <label style="color:#ddd;font-size:0.9rem">Enable Video Ads</label>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-          <div><label class="flbl">Skip After (sec)</label><input id="adSkip" type="number"></div>
-          <div><label class="flbl">Show Every N videos</label><input id="adFreq" type="number"></div>
-        </div>
-        <div style="display:flex;gap:8px;margin-bottom:10px">
-          <button id="adTypePreroll"  class="atype-btn active" onclick="Admin.setAdType('preroll',this)">Pre-roll</button>
-          <button id="adTypeMidroll"  class="atype-btn" onclick="Admin.setAdType('midroll',this)">Mid-roll</button>
-          <button id="adTypeBumper"   class="atype-btn" onclick="Admin.setAdType('bumper',this)">Bumper</button>
-          <button id="adTypeOverlay"  class="atype-btn" onclick="Admin.setAdType('overlay',this)">Overlay</button>
-        </div>
-        <textarea id="adCode" style="width:100%;height:100px;background:#111;color:lime;border:1px solid #333;border-radius:8px;padding:10px;font-size:0.78rem" placeholder="Paste ad HTML/script here..."></textarea>
-      </div>
-      <!-- Home Ad -->
-      <div class="card" style="margin-bottom:12px">
-        <h3 style="margin-bottom:8px"><i class="fas fa-home" style="color:#06b6d4"></i> Home Banner Ad</h3>
-        <textarea id="cfHomeAd" style="width:100%;height:80px;background:#111;color:lime;border:1px solid #333;border-radius:8px;padding:10px;font-size:0.78rem" placeholder="Home page banner ad code..."></textarea>
-      </div>
-      <!-- Maintenance -->
-      <div class="card" style="margin-bottom:12px">
-        <div style="display:flex;align-items:center;justify-content:space-between">
-          <div><h3>🔧 Maintenance Mode</h3><p style="color:#888;font-size:0.82rem">Maintenance mode prevents login</p></div>
-          <input type="checkbox" id="cfMaint" style="width:22px;height:22px">
-        </div>
-      </div>
-      <button class="btn-primary" onclick="Admin.saveCfg()"><i class="fas fa-save"></i> Save All Config</button>
     </div>
   </div>
-
-  <div style="height:80px"></div>
 </div>
 
-<!-- ============ VIDEO PLAYER OVERLAY ============ -->
-<div id="vpOverlay" class="modal-ov hidden" style="align-items:flex-start;padding:0;background:#000;overflow-y:auto;flex-direction:column">
-  <div id="vpWrap" style="width:100%;max-width:720px;margin:0 auto;background:#0a0a0a">
-    <div style="position:sticky;top:0;z-index:10;background:#000">
-      <div class="yt-vf" id="ytVF">
-        <iframe id="vpFrame" src="" frameborder="0" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture;web-share" allowfullscreen></iframe>
-      </div>
+<!-- ========== VIDEO PLAYER ========== -->
+<div id="vpOverlay" class="hidden" style="position:fixed;inset:0;background:#000;z-index:3000;display:flex;flex-direction:column;overflow-y:auto;">
+  <div style="width:100%;max-width:720px;margin:0 auto;background:var(--bg2);">
+    <div class="yt-vf" id="ytVF">
+      <iframe id="vpFrame" src="" frameborder="0" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe>
     </div>
-    <div style="padding:12px 14px 0">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
-        <h3 id="vpTitle" style="margin:0;font-size:1rem;color:white;line-height:1.35;flex:1;margin-right:10px"></h3>
-        <button onclick="VidSys.close()" style="background:none;border:none;color:#888;font-size:1.3rem;cursor:pointer;padding:4px"><i class="fas fa-times"></i></button>
+    <div class="vp-body">
+      <div class="vp-title-row">
+        <div id="vpTitle" class="vp-title">Video Title</div>
+        <button class="vp-close" onclick="VidSys.close()"><i class="fas fa-times"></i></button>
       </div>
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px">
-        <span id="vpViews" style="color:#888;font-size:0.8rem"></span>
-        <span style="color:#444">•</span>
-        <span id="vpDate" style="color:#888;font-size:0.8rem"></span>
-        <span id="vpCat" style="background:rgba(255,255,255,0.06);color:#aaa;font-size:0.75rem;padding:2px 8px;border-radius:10px"></span>
+      <div class="vp-meta">
+        <span id="vpViews"></span>
+        <span>•</span>
+        <span id="vpDate"></span>
+        <span id="vpCat" style="background:rgba(255,255,255,.06);padding:2px 8px;border-radius:10px;font-size:.72rem"></span>
       </div>
       <!-- Rating bar -->
       <div class="rating-bar" id="vpRatingBar" style="display:none"><div class="rating-fill" id="vpRatingFill" style="width:80%"></div></div>
-      <!-- Actions -->
+      <!-- Action buttons -->
       <div class="vp-actions">
         <button class="vp-btn" id="vpLikeBtn" onclick="VidSys.like()"><i class="fas fa-thumbs-up"></i><span id="vpLikeN">0</span></button>
-        <button class="vp-btn" id="vpDislikeBtn" onclick="VidSys.dislike()"><i class="fas fa-thumbs-down"></i></button>
+        <button class="vp-btn" id="vpDislikeBtn" onclick="VidSys.dislike()"><i class="fas fa-thumbs-down"></i><span></span></button>
         <button class="vp-btn" onclick="VidSys.share()"><i class="fas fa-share"></i><span>Share</span></button>
         <button class="vp-btn" id="vpSaveBtn" onclick="VidSys.save()"><i class="fas fa-bookmark"></i><span>Save</span></button>
+        <button class="vp-btn" onclick="VidSys.download()"><i class="fas fa-download"></i><span>Download</span></button>
         <button class="vp-btn" onclick="VidSys.addToPlaylist()"><i class="fas fa-list-ul"></i><span>Playlist</span></button>
-        <button class="vp-btn" onclick="VidSys.toggleMini()"><i class="fas fa-compress-alt"></i><span>Mini</span></button>
         <button class="vp-btn" onclick="VidSys.report()"><i class="fas fa-flag"></i><span>Report</span></button>
       </div>
-      <!-- Reactions -->
-      <div class="reaction-bar" id="vpReactions">
-        <button class="reaction-btn" onclick="VidSys.react('fire')" id="rr-fire">🔥 <span id="rc-fire">0</span></button>
-        <button class="reaction-btn" onclick="VidSys.react('love')" id="rr-love">❤️ <span id="rc-love">0</span></button>
-        <button class="reaction-btn" onclick="VidSys.react('wow')" id="rr-wow">😮 <span id="rc-wow">0</span></button>
-        <button class="reaction-btn" onclick="VidSys.react('haha')" id="rr-haha">😂 <span id="rc-haha">0</span></button>
-        <button class="super-chat-btn" onclick="document.getElementById('superChatModal').classList.remove('hidden')" style="margin-left:auto;font-size:0.75rem;padding:6px 12px"><i class="fas fa-star"></i> Super</button>
+      <!-- Emoji reactions -->
+      <div class="vp-reactions">
+        <button class="react-btn" onclick="VidSys.react('fire')" id="rr-fire">🔥 <span class="react-count" id="rc-fire">0</span></button>
+        <button class="react-btn" onclick="VidSys.react('love')" id="rr-love">❤️ <span class="react-count" id="rc-love">0</span></button>
+        <button class="react-btn" onclick="VidSys.react('wow')" id="rr-wow">😮 <span class="react-count" id="rc-wow">0</span></button>
+        <button class="react-btn" onclick="VidSys.react('haha')" id="rr-haha">😂 <span class="react-count" id="rc-haha">0</span></button>
+        <button class="super-btn" onclick="document.getElementById('superChatModal').classList.remove('hidden')"><i class="fas fa-star"></i> Super Chat</button>
       </div>
       <!-- Channel row -->
       <div class="vp-ch-row">
-        <img id="vpChAv" src="" onclick="VidSys.goChannel()" style="width:42px;height:42px;border-radius:50%;object-fit:cover;flex-shrink:0;cursor:pointer">
-        <div style="flex:1;cursor:pointer" onclick="VidSys.goChannel()">
-          <div id="vpChName" style="font-weight:700;font-size:0.95rem;color:white"></div>
-          <div id="vpChSubs" style="color:#888;font-size:0.78rem"></div>
+        <img id="vpChAv" src="" class="vp-ch-av" onerror="this.src='https://cdn-icons-png.flaticon.com/512/149/149071.png'">
+        <div class="vp-ch-info" onclick="VidSys.goChannel()">
+          <div id="vpChName" class="vp-ch-name"></div>
+          <div id="vpChSubs" class="vp-ch-subs"></div>
         </div>
         <button id="vpSubBtn" class="vp-sub-btn" onclick="VidSys.subscribe()">Subscribe</button>
         <button id="vpBellBtn" class="vp-bell-btn" onclick="VidSys.bell()">🔔</button>
       </div>
       <!-- Description -->
-      <div class="vp-desc" id="vpDescBox">
+      <div class="vp-desc" id="vpDescBox" onclick="VidSys.toggleDesc()">
         <div id="vpDescTxt" class="vp-desc-txt">No description.</div>
-        <div id="vpDescMore" class="vp-desc-more" onclick="VidSys.toggleDesc()">Show more</div>
+        <div id="vpDescMore" class="vp-desc-more">Show more</div>
       </div>
-      <!-- Tags -->
-      <div id="vpTags" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px"></div>
-      <!-- Watch Progress -->
-      <div class="vp-progress-wrap">
+      <!-- Watch progress -->
+      <div class="vp-prog-wrap">
         <div style="display:flex;justify-content:space-between;margin-bottom:6px">
-          <span style="color:#888;font-size:0.8rem">Watch Progress</span>
-          <span id="vpPct" style="color:var(--primary);font-weight:700;font-size:0.8rem">0%</span>
+          <span style="color:var(--text2);font-size:.8rem">Watch Progress</span>
+          <span id="vpPct" style="color:var(--cyan);font-weight:700;font-size:.8rem">0%</span>
         </div>
         <div class="vp-prog-bar"><div id="vpProgFill" style="width:0%"></div></div>
         <div style="display:flex;justify-content:space-between;margin-top:5px">
-          <span style="color:#444;font-size:0.75rem">Elapsed: <b id="vpElapsed" style="color:#888">0s</b></span>
-          <span style="color:#444;font-size:0.75rem">Required: <b id="vpNeeded" style="color:#888">0s</b></span>
+          <span style="color:#444;font-size:.75rem">Elapsed: <b id="vpElapsed" style="color:#888">0s</b></span>
+          <span style="color:#444;font-size:.75rem">Required: <b id="vpNeeded" style="color:#888">0s</b></span>
         </div>
       </div>
-      <div id="vpMsg" style="text-align:center;color:#444;font-size:0.8rem;margin:8px 0"></div>
-      <button id="vpClaimBtn" class="btn-primary hidden" style="margin-bottom:14px" onclick="VidSys.claim()"><i class="fas fa-check-circle"></i> Mark as Watched</button>
-      <!-- Chapters -->
-      <div id="vpChaptersWrap" class="hidden">
-        <h4 style="font-size:0.88rem;margin:8px 0 6px;color:#aaa">Chapters</h4>
-        <div id="vpChaptersList" class="chapters-list"></div>
+      <div id="vpMsg" style="text-align:center;color:#444;font-size:.8rem;margin:8px 14px">Watching to support the creator...</div>
+      <div style="padding:0 14px;margin-bottom:14px">
+        <button id="vpClaimBtn" class="btn-primary hidden" onclick="VidSys.claim()"><i class="fas fa-check-circle"></i> Mark as Watched</button>
       </div>
-      <!-- Poll -->
-      <div id="vpPollWrap" class="hidden">
-        <div class="poll-widget">
-          <p style="font-weight:700;font-size:0.9rem;margin-bottom:10px" id="vpPollQ"></p>
-          <div id="vpPollOpts"></div>
-          <p style="color:#555;font-size:0.75rem;margin-top:6px" id="vpPollVotes"></p>
-        </div>
-      </div>
+      <!-- Tags -->
+      <div id="vpTags" style="padding:0 14px;display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px"></div>
       <!-- Comments -->
       <div class="vp-comments">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
-          <span style="font-weight:700;font-size:0.95rem">Comments</span>
-          <span id="vpComCnt" style="color:#888;font-size:0.85rem">0</span>
-          <select id="vpComSort" style="margin-left:auto;background:#1a1a2e;color:#aaa;border:1px solid #333;border-radius:8px;padding:4px 8px;font-size:0.78rem" onchange="VidSys.loadComments(null,this.value)">
+        <div class="vp-com-header">
+          <span>Comments</span>
+          <span id="vpComCnt" class="vp-com-cnt">0</span>
+          <select id="vpComSort" class="vp-com-sort" onchange="VidSys.sortComments(this.value)">
             <option value="top">Top Comments</option>
             <option value="new">Newest First</option>
           </select>
         </div>
         <div class="vp-com-in">
-          <img id="vpMyAv" src="" style="width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0">
+          <img id="vpMyAv" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="vp-com-av">
           <div style="flex:1">
             <textarea id="vpComInput" class="vp-com-box" placeholder="Add a comment..." rows="1" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
             <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px">
-              <button onclick="document.getElementById('vpComInput').value=''" style="background:none;border:none;color:#888;cursor:pointer;font-size:0.82rem;padding:6px 10px">Cancel</button>
+              <button onclick="document.getElementById('vpComInput').value=''" style="background:none;border:none;color:#888;cursor:pointer;font-size:.82rem;padding:6px 10px">Cancel</button>
               <button class="vp-com-sub" onclick="VidSys.postComment()">Comment</button>
             </div>
           </div>
@@ -833,78 +762,98 @@
         <div id="vpComList"></div>
       </div>
       <!-- Related -->
-      <div style="margin-top:14px;margin-bottom:80px">
-        <h3 style="font-size:0.95rem;margin-bottom:10px;color:#aaa">Up Next</h3>
+      <div style="margin:14px 14px 80px">
+        <h3 style="font-size:.95rem;margin-bottom:10px;color:var(--text2)">Up Next</h3>
         <div id="vpRelated"></div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- AD OVERLAY -->
-<div id="adOverlay" class="modal-ov hidden" style="padding:0;background:#000;flex-direction:column;justify-content:flex-end;align-items:stretch">
-  <div id="adContent" style="flex:1;background:#111;display:flex;align-items:center;justify-content:center;overflow:hidden;min-height:200px;position:relative">
+<!-- ========== AD OVERLAY ========== -->
+<div id="adOverlay" class="hidden" style="position:fixed;inset:0;background:#000;z-index:4000;display:flex;flex-direction:column;">
+  <div class="ad-content">
     <div id="adInner"></div>
-    <div class="ad-reward-badge" id="adCoinBadge" style="display:none"><i class="fas fa-coins"></i> +<span id="adCoinAmt">2</span> coins</div>
-    <div class="ad-branding" id="adBrand"><span id="adBrandName">Advertisement</span></div>
-    <button class="skip-ad-btn locked" id="adSkipBtn" onclick="AdSys.skip()">
-      <span id="adSkipTxt">Ad in <span id="adTxt">5</span>s</span>
+    <div class="ad-coin-badge" id="adCoinBadge" style="display:none"><i class="fas fa-coins"></i> +<span id="adCoinAmt">2</span> coins</div>
+    <button class="ad-skip-btn locked" id="adSkipBtn" onclick="AdSys.skip()">
+      <span id="adSkipTxt">Ad ends in <span id="adTxt">5</span>s</span>
       <i class="fas fa-forward" id="adSkipIcon" style="display:none"></i>
     </button>
-    <div class="bumper-timer hidden" id="bumperTimer">Ad: <b id="bumperSecs">6</b>s</div>
   </div>
-  <div style="background:rgba(0,0,0,0.95);padding:10px 14px;display:flex;align-items:center;gap:12px">
+  <div class="ad-ctrl">
     <div style="flex:1">
-      <div style="font-size:0.72rem;color:#888;margin-bottom:4px">Advertisement — Video continues after ad</div>
-      <div class="ad-bar"><div id="adFill" style="height:100%"></div></div>
+      <div style="font-size:.72rem;color:#888;margin-bottom:4px">Advertisement — Video continues after ad</div>
+      <div class="ad-bar"><div id="adFill" style="height:100%;transition:width 1s linear"></div></div>
     </div>
-    <span id="adCountdown" style="color:white;font-size:0.85rem;font-weight:700;min-width:28px">5s</span>
+    <span id="adCountdown" style="color:white;font-size:.85rem;font-weight:700;min-width:28px;text-align:right">5s</span>
   </div>
 </div>
 
-<!-- SHARE SHEET -->
-<div class="share-sheet hidden" id="shareSheet" onclick="if(event.target===this)this.classList.add('hidden')">
-  <div class="share-panel">
+<!-- ========== NOTIFICATIONS PANEL ========== -->
+<div id="notifPanel" class="notif-panel">
+  <div class="notif-header">
+    <h3 style="margin:0"><i class="fas fa-bell" style="color:var(--gold);margin-right:8px"></i>Notifications</h3>
+    <div style="display:flex;gap:8px">
+      <button onclick="NotifSys.markRead()" style="background:none;border:none;color:var(--cyan);font-size:.8rem;cursor:pointer">Mark all read</button>
+      <button onclick="NotifSys.toggle()" style="background:none;border:none;color:#888;font-size:1.2rem;cursor:pointer"><i class="fas fa-times"></i></button>
+    </div>
+  </div>
+  <div id="notifList"></div>
+</div>
+<div id="notifBg" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:4999" onclick="NotifSys.toggle()"></div>
+
+<!-- ========== SHARE SHEET ========== -->
+<div id="shareSheet" class="modal-ov hidden" onclick="if(event.target===this)this.classList.add('hidden')">
+  <div class="modal-sheet">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
       <h3>Share Video</h3>
       <button onclick="document.getElementById('shareSheet').classList.add('hidden')" style="background:none;border:none;color:#888;font-size:1.2rem;cursor:pointer"><i class="fas fa-times"></i></button>
     </div>
-    <p id="shareVideoTitle" style="color:#888;font-size:0.82rem;margin-bottom:12px"></p>
+    <p id="shareVideoTitle" style="color:var(--text2);font-size:.82rem;margin-bottom:12px"></p>
     <div class="share-grid">
       <div class="share-item" onclick="VidSys.shareTo('whatsapp')"><div class="share-icon" style="background:#25D366"><i class="fab fa-whatsapp" style="color:white"></i></div><span class="share-label">WhatsApp</span></div>
       <div class="share-item" onclick="VidSys.shareTo('facebook')"><div class="share-icon" style="background:#1877F2"><i class="fab fa-facebook-f" style="color:white"></i></div><span class="share-label">Facebook</span></div>
       <div class="share-item" onclick="VidSys.shareTo('twitter')"><div class="share-icon" style="background:#1DA1F2"><i class="fab fa-twitter" style="color:white"></i></div><span class="share-label">Twitter</span></div>
       <div class="share-item" onclick="VidSys.shareTo('telegram')"><div class="share-icon" style="background:#0088cc"><i class="fab fa-telegram-plane" style="color:white"></i></div><span class="share-label">Telegram</span></div>
-      <div class="share-item" onclick="VidSys.shareTo('copy')"><div class="share-icon" style="background:#333"><i class="fas fa-link" style="color:#0ff"></i></div><span class="share-label">Copy Link</span></div>
+      <div class="share-item" onclick="VidSys.shareTo('copy')"><div class="share-icon" style="background:#333"><i class="fas fa-link" style="color:var(--cyan)"></i></div><span class="share-label">Copy Link</span></div>
+      <div class="share-item" onclick="VidSys.shareTo('embed')"><div class="share-icon" style="background:#333"><i class="fas fa-code" style="color:#f0a"></i></div><span class="share-label">Embed</span></div>
+      <div class="share-item" onclick="VidSys.shareTo('sms')"><div class="share-icon" style="background:#4CAF50"><i class="fas fa-sms" style="color:white"></i></div><span class="share-label">SMS</span></div>
       <div class="share-item" onclick="VidSys.shareTo('native')"><div class="share-icon" style="background:#444"><i class="fas fa-share-alt" style="color:white"></i></div><span class="share-label">More</span></div>
     </div>
-    <div class="share-url-row"><span class="share-url" id="shareUrl"></span><button class="share-copy-btn" onclick="VidSys.shareTo('copy')">Copy</button></div>
+    <div class="share-url-row">
+      <span class="share-url" id="shareUrl"></span>
+      <button class="share-copy-btn" onclick="VidSys.shareTo('copy')">Copy</button>
+    </div>
   </div>
 </div>
 
-<!-- REPORT MODAL -->
-<div class="report-modal hidden" id="reportModal" onclick="if(event.target===this)this.classList.add('hidden')">
-  <div class="report-panel">
+<!-- ========== REPORT MODAL ========== -->
+<div id="reportModal" class="modal-ov hidden" onclick="if(event.target===this)this.classList.add('hidden')">
+  <div class="modal-sheet">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-      <h3><i class="fas fa-flag" style="color:#ef4444;margin-right:8px"></i>Report Video</h3>
+      <h3><i class="fas fa-flag" style="color:var(--red);margin-right:8px"></i>Report Video</h3>
       <button onclick="document.getElementById('reportModal').classList.add('hidden')" style="background:none;border:none;color:#888;font-size:1.2rem;cursor:pointer"><i class="fas fa-times"></i></button>
     </div>
-    <div class="report-opt" onclick="VidSys.submitReport('Spam')">🚫 Spam or misleading</div>
-    <div class="report-opt" onclick="VidSys.submitReport('Hate speech')">😡 Hate speech</div>
-    <div class="report-opt" onclick="VidSys.submitReport('Violence')">⚠️ Violence</div>
-    <div class="report-opt" onclick="VidSys.submitReport('Adult content')">🔞 Adult content</div>
-    <div class="report-opt" onclick="VidSys.submitReport('Copyright')">©️ Copyright issue</div>
+    <p style="color:var(--text2);font-size:.82rem;margin-bottom:12px">Why are you reporting this video?</p>
+    <div class="report-opt" onclick="VidSys.submitReport('Spam or misleading')">🚫 Spam or misleading</div>
+    <div class="report-opt" onclick="VidSys.submitReport('Hateful or abusive')">😡 Hateful or abusive</div>
+    <div class="report-opt" onclick="VidSys.submitReport('Violent content')">⚠️ Violent content</div>
+    <div class="report-opt" onclick="VidSys.submitReport('Inappropriate content')">🔞 Inappropriate content</div>
+    <div class="report-opt" onclick="VidSys.submitReport('Copyright issue')">©️ Copyright issue</div>
+    <div class="report-opt" onclick="VidSys.submitReport('Child safety')">👶 Child safety</div>
   </div>
 </div>
 
-<!-- SUPER CHAT MODAL -->
-<div class="super-chat-modal hidden" id="superChatModal" onclick="if(event.target===this)this.classList.add('hidden')">
-  <div class="super-chat-panel">
+<!-- ========== SUPER CHAT MODAL ========== -->
+<div id="superChatModal" class="modal-ov hidden" onclick="if(event.target===this)this.classList.add('hidden')">
+  <div class="modal-sheet">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-      <h3>💛 Super Chat</h3>
+      <h3>⭐ Super Chat</h3>
       <button onclick="document.getElementById('superChatModal').classList.add('hidden')" style="background:none;border:none;color:#888;font-size:1.2rem;cursor:pointer"><i class="fas fa-times"></i></button>
     </div>
+    <p style="color:var(--text2);font-size:.82rem;margin-bottom:14px">Send a highlighted message to support the creator!</p>
     <textarea id="scMessage" class="vp-com-box" placeholder="Your message..." rows="3" style="margin-bottom:12px"></textarea>
+    <p style="color:var(--text2);font-size:.82rem;margin-bottom:8px">Choose amount:</p>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px">
       <button class="sc-amt-btn" onclick="VidSys.scSelect(this,20)">20 coins</button>
       <button class="sc-amt-btn" onclick="VidSys.scSelect(this,50)">50 coins</button>
@@ -913,141 +862,92 @@
       <button class="sc-amt-btn" onclick="VidSys.scSelect(this,500)">500 coins</button>
       <button class="sc-amt-btn" onclick="VidSys.scSelect(this,1000)">1000 coins</button>
     </div>
-    <button class="super-chat-btn" style="width:100%;justify-content:center" onclick="VidSys.sendSuperChat()"><i class="fas fa-star"></i> Send Super Chat</button>
+    <button class="btn-primary" style="background:linear-gradient(135deg,#ffd700,#ff6b00);color:#000" onclick="VidSys.sendSuperChat()"><i class="fas fa-star"></i> Send Super Chat</button>
   </div>
 </div>
 
-<!-- MINI PLAYER -->
-<div class="mini-player" id="miniPlayer">
-  <div class="mini-player-frame" id="miniFrame"></div>
-  <div class="mini-player-bar">
-    <span class="mini-player-title" id="miniTitle"></span>
-    <button class="mini-player-btn" onclick="VidSys.expandMini()"><i class="fas fa-expand-alt"></i></button>
-    <button class="mini-player-btn" onclick="VidSys.closeMini()"><i class="fas fa-times"></i></button>
-  </div>
-</div>
-
-<!-- PLAYLIST MODAL -->
-<div id="playlistModal" class="modal-ov hidden" style="align-items:flex-end;padding:0">
-  <div style="background:#1a1a2e;width:100%;max-width:600px;border-radius:20px 20px 0 0;padding:20px;max-height:60vh;overflow-y:auto">
+<!-- ========== PLAYLIST MODAL ========== -->
+<div id="playlistModal" class="modal-ov hidden" onclick="if(event.target===this)this.classList.add('hidden')">
+  <div class="modal-sheet">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-      <h3><i class="fas fa-list-ul" style="color:var(--primary);margin-right:8px"></i>Save to Playlist</h3>
+      <h3><i class="fas fa-list-ul" style="color:var(--cyan);margin-right:8px"></i>Save to Playlist</h3>
       <button onclick="document.getElementById('playlistModal').classList.add('hidden')" style="background:none;border:none;color:#888;font-size:1.2rem;cursor:pointer"><i class="fas fa-times"></i></button>
     </div>
     <div id="playlistList"></div>
     <div style="margin-top:12px">
       <div class="inp-group"><i class="fas fa-plus"></i><input id="newPlaylistName" placeholder="Create new playlist..."></div>
-      <button class="btn-primary btn-sm" onclick="VidSys.createPlaylist()"><i class="fas fa-plus"></i> Create</button>
+      <button class="btn-primary btn-sm" style="width:auto;padding:8px 20px" onclick="VidSys.createPlaylist()"><i class="fas fa-plus"></i> Create Playlist</button>
     </div>
   </div>
 </div>
 
-<!-- NOTIFICATIONS PANEL -->
-<div id="notifPanel" class="notif-panel hidden">
-  <div class="notif-header">
-    <h3><i class="fas fa-bell" style="color:#ffd700;margin-right:8px"></i>Notifications</h3>
-    <div style="display:flex;gap:8px">
-      <button onclick="NotifSys.markAllRead()" style="background:none;border:none;color:var(--primary);font-size:0.8rem;cursor:pointer">Mark all read</button>
-      <button onclick="NotifSys.toggle()" style="background:none;border:none;color:#888;font-size:1.2rem;cursor:pointer"><i class="fas fa-times"></i></button>
-    </div>
-  </div>
-  <div id="notifList" style="padding:0"></div>
-</div>
-<div id="notifBg" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:4999" onclick="NotifSys.toggle()"></div>
-
-<!-- LEVEL UP MODAL -->
-<div id="levelUpModal" class="level-up-modal hidden">
-  <div class="level-up-card">
-    <div class="lup-anim">⭐</div>
-    <h2>Level Up!</h2>
-    <div id="lupNewLevel" class="lup-level"></div>
-    <p id="lupTitle" style="color:#ffd700;font-size:1.1rem;font-weight:700"></p>
-    <p id="lupDesc" style="color:#aaa;font-size:0.85rem;margin-top:6px"></p>
-    <button class="btn-primary" style="margin-top:16px" onclick="document.getElementById('levelUpModal').classList.add('hidden')">Awesome! 🎉</button>
-  </div>
-</div>
-
-<!-- ACHIEVEMENT MODAL -->
-<div id="achieveModal" class="modal-ov hidden" style="align-items:flex-end;padding:0">
-  <div style="background:#1a1a2e;width:100%;border-radius:20px 20px 0 0;padding:20px;max-height:80vh;overflow-y:auto">
+<!-- ========== STREAK MODAL ========== -->
+<div id="streakModal" class="modal-ov hidden" onclick="if(event.target===this)StreakSys.close()">
+  <div class="modal-sheet">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-      <h3><i class="fas fa-medal" style="color:#a78bfa;margin-right:8px"></i>All Achievements</h3>
+      <h3>🔥 Daily Login Streak</h3>
+      <button onclick="StreakSys.close()" style="background:none;border:none;color:#888;font-size:1.2rem;cursor:pointer"><i class="fas fa-times"></i></button>
+    </div>
+    <div id="streakDayGrid" class="streak-day-grid"></div>
+    <div id="streakRewardInfo" style="text-align:center;padding:12px;background:rgba(251,191,36,.08);border-radius:10px;margin:10px 0"></div>
+    <button class="btn-primary" onclick="StreakSys.claim()"><i class="fas fa-gift"></i> Claim Daily Reward (+80 coins)</button>
+  </div>
+</div>
+
+<!-- ========== ACHIEVEMENT MODAL ========== -->
+<div id="achieveModal" class="modal-ov hidden" onclick="if(event.target===this)this.classList.add('hidden')">
+  <div class="modal-sheet">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <h3>🏆 Achievements</h3>
       <button onclick="document.getElementById('achieveModal').classList.add('hidden')" style="background:none;border:none;color:#888;font-size:1.2rem;cursor:pointer"><i class="fas fa-times"></i></button>
     </div>
     <div id="allAchievements"></div>
   </div>
 </div>
 
-<!-- STREAK MODAL -->
-<div id="streakModal" class="modal-ov hidden" style="align-items:center;justify-content:center">
-  <div class="streak-modal-card">
-    <div style="font-size:3rem;text-align:center;margin-bottom:8px">🔥</div>
-    <h2 style="text-align:center">Daily Streak</h2>
-    <div id="streakDayGrid" class="streak-day-grid"></div>
-    <div id="streakRewardInfo" style="text-align:center;padding:12px;background:rgba(255,215,0,0.08);border-radius:10px;margin:10px 0"></div>
-    <button class="btn-primary" onclick="StreakSys.claim()"><i class="fas fa-gift"></i> Claim Daily Reward</button>
-    <button onclick="document.getElementById('streakModal').classList.add('hidden')" style="background:none;border:none;color:#888;margin-top:8px;cursor:pointer;width:100%;padding:8px">Close</button>
-  </div>
+<!-- ========== LEVEL UP MODAL ========== -->
+<div id="levelUpModal" class="level-up-modal">
+  <div style="font-size:1rem;color:var(--text2)">Level Up!</div>
+  <div id="lupNewLevel" class="lup-level"></div>
+  <div style="font-size:.85rem;color:var(--text2)">Keep earning to level up more!</div>
 </div>
 
-<!-- PWA INSTALL BANNER -->
-<div id="pwaInstallBanner" style="display:none;position:fixed;bottom:75px;left:0;right:0;z-index:9999;background:linear-gradient(135deg,#0d0d20,#1a1a3e);border-top:1px solid rgba(124,58,237,0.4);padding:12px 16px">
+<!-- ========== PWA BANNERS ========== -->
+<div id="pwaInstallBanner" style="display:none;position:fixed;bottom:75px;left:0;right:0;z-index:4999;background:linear-gradient(135deg,#0d0d20,#1a1a3e);border-top:1px solid rgba(124,58,237,.4);padding:12px 16px">
   <div style="display:flex;align-items:center;gap:10px;max-width:600px;margin:0 auto">
     <img src="https://cdn-icons-png.flaticon.com/512/2910/2910791.png" style="width:44px;height:44px;border-radius:12px">
-    <div style="flex:1"><div style="font-weight:700;font-size:0.88rem;color:white">Install TaskMint Pro</div><div style="font-size:0.75rem;color:#aaa">Use like a native app. Works offline too!</div></div>
-    <button onclick="PWA.install()" style="background:var(--grad-primary);border:none;color:white;padding:7px 14px;border-radius:16px;font-weight:700;font-size:0.78rem;cursor:pointer">Install</button>
+    <div style="flex:1"><div style="font-weight:700;font-size:.88rem;color:white">Install TaskMint Pro</div><div style="font-size:.75rem;color:#aaa">Use like a native app. Works offline too!</div></div>
+    <button onclick="PWA.install()" style="background:var(--grad);border:none;color:white;padding:7px 14px;border-radius:16px;font-weight:700;font-size:.78rem;cursor:pointer">Install</button>
     <button onclick="PWA.dismissBanner()" style="background:none;border:none;color:#555;font-size:1rem;cursor:pointer">✕</button>
   </div>
 </div>
-
-<!-- NOTIF PERMISSION PROMPT -->
-<div id="notifPrompt" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9998;background:rgba(10,0,20,0.97);border-bottom:1px solid rgba(124,58,237,0.3);padding:10px 16px">
+<div id="notifPrompt" style="display:none;position:fixed;top:0;left:0;right:0;z-index:4998;background:rgba(10,0,20,.97);border-bottom:1px solid rgba(124,58,237,.3);padding:10px 16px">
   <div style="display:flex;align-items:center;gap:10px;max-width:600px;margin:0 auto">
     <span style="font-size:1.2rem">🔔</span>
-    <div style="flex:1"><div style="font-weight:700;font-size:0.85rem;color:white">Enable Notifications</div><div style="font-size:0.72rem;color:#888">Get instant alerts for tasks, coins & subscribers</div></div>
-    <button onclick="PWA.requestNotifPermission()" style="background:rgba(124,58,237,0.3);border:1px solid rgba(124,58,237,0.5);color:#a78bfa;padding:6px 12px;border-radius:14px;font-size:0.75rem;font-weight:700;cursor:pointer">Enable</button>
+    <div style="flex:1"><div style="font-weight:700;font-size:.85rem;color:white">Enable Notifications</div><div style="font-size:.72rem;color:#888">Get instant alerts for tasks, coins & subscribers</div></div>
+    <button onclick="PWA.requestNotifPermission()" style="background:rgba(124,58,237,.3);border:1px solid rgba(124,58,237,.5);color:#a78bfa;padding:6px 12px;border-radius:14px;font-size:.75rem;font-weight:700;cursor:pointer">Enable</button>
     <button onclick="document.getElementById('notifPrompt').style.display='none'" style="background:none;border:none;color:#555;cursor:pointer">✕</button>
   </div>
 </div>
 
-<!-- TASK OVERLAY -->
-<div id="taskOv" class="modal-ov hidden">
-  <div class="glass-card text-center" style="min-width:300px;max-width:90%">
+<!-- ========== TASK OVERLAY ========== -->
+<div id="taskOv" class="modal-ov hidden" style="align-items:center;justify-content:center">
+  <div class="glass-card text-c" style="min-width:280px;max-width:90%;text-align:center;padding:28px">
     <div class="spinner" style="margin:0 auto 20px"></div>
     <h2 style="color:white">Verifying Task...</h2>
-    <h1 id="taskTimer" style="font-size:4rem;color:var(--primary);margin:15px 0">10</h1>
+    <h1 id="taskTimer" style="font-size:4rem;color:var(--cyan);margin:16px 0;font-weight:900">10</h1>
     <p style="color:#888">Please keep this window open</p>
   </div>
 </div>
 
-<!-- LOADING OVERLAY -->
-<div id="loadingOverlay" class="loading-overlay hidden">
-  <div class="loading-content">
-    <div class="loading-gem"><i class="fas fa-gem"></i></div>
-    <p id="loadingMsg">Loading...</p>
-  </div>
-</div>
-
-<!-- BOTTOM NAV -->
-<nav id="mainNav" class="bottom-nav hidden">
-  <button class="nav-btn active" onclick="Router.go('home')" id="nav-home">
-    <i class="fas fa-home"></i><span>Home</span>
-  </button>
-  <button class="nav-btn" onclick="Router.go('videos')" id="nav-videos">
-    <i class="fas fa-play-circle"></i><span>Videos</span>
-  </button>
-  <button class="nav-btn" onclick="Router.go('games')" id="nav-games">
-    <i class="fas fa-gamepad"></i><span>Games</span>
-  </button>
-  <button class="nav-btn" onclick="Router.go('leaderboard')" id="nav-leaderboard">
-    <i class="fas fa-trophy"></i><span>Ranks</span>
-  </button>
-  <button class="nav-btn" onclick="Router.go('referral')" id="nav-referral">
-    <i class="fas fa-users"></i><span>Refer</span>
-  </button>
-  <button class="nav-btn" onclick="Router.go('withdraw')" id="nav-withdraw">
-    <i class="fas fa-wallet"></i><span>Wallet</span>
-  </button>
+<!-- ========== BOTTOM NAV ========== -->
+<nav id="mainNav" class="hidden">
+  <button class="nav-btn active" onclick="Router.go('home')" id="nav-home"><i class="fas fa-home"></i><span>Home</span></button>
+  <button class="nav-btn" onclick="Router.go('videos')" id="nav-videos"><i class="fas fa-play-circle"></i><span>Videos</span></button>
+  <button class="nav-btn" onclick="Router.go('games')" id="nav-games"><i class="fas fa-gamepad"></i><span>Games</span></button>
+  <button class="nav-btn" onclick="Router.go('leaderboard')" id="nav-leaderboard"><i class="fas fa-trophy"></i><span>Ranks</span></button>
+  <button class="nav-btn" onclick="Router.go('referral')" id="nav-referral"><i class="fas fa-users"></i><span>Refer</span></button>
+  <button class="nav-btn" onclick="Router.go('withdraw')" id="nav-withdraw"><i class="fas fa-wallet"></i><span>Withdraw</span></button>
 </nav>
 
 <script src="script.js"></script>
