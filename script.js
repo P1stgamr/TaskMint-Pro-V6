@@ -85,15 +85,16 @@ var DB = {
       _db.ref('config').get().then(function(s) {
         clearTimeout(t);
         _cfg = s.exists() ? Object.assign({},DC,s.val()) : Object.assign({},DC);
-        if (!s.exists()) _db.ref('config').set(DC);
+        /* Only write default config if truly empty — never overwrite existing */
+        if (!s.exists()) { try { _db.ref('config').set(DC); } catch(e) {} }
         ok();
       }).catch(function(e){ clearTimeout(t); err(new Error('DB error: '+e.message)); });
     });
   },
   r:   function(p){ return new Promise(function(res){ if(!_db){res(null);return;} var t=setTimeout(function(){res(null);},8000); _db.ref(p).once('value',function(s){clearTimeout(t);res(s.exists()?s.val():null);},function(){clearTimeout(t);res(null);}); }); },
-  w:   function(p,d){ if(!_db) return Promise.resolve(); return _db.ref(p).set(d).catch(function(){}); },
+  w:   function(p,d){ if(!_db) return Promise.resolve(); if(d===null||d===undefined){console.warn('DB.w blocked null write to:',p);return Promise.resolve();} return _db.ref(p).set(d).catch(function(){}); },
   u:   function(p,d){ if(!_db) return Promise.resolve(); return _db.ref(p).update(d).catch(function(){}); },
-  del: function(p){   if(!_db) return Promise.resolve(); return _db.ref(p).remove().catch(function(){}); },
+  del: function(p){   if(!_db) return Promise.resolve(); if(!p||p==='/'||p===''){ console.warn('DB.del blocked root deletion'); return Promise.resolve(); } return _db.ref(p).remove().catch(function(){}); },
   getUser:  function(id){ if(!id) return Promise.resolve(null); return DB.r('users/'+id); },
   uu:       function(id,d){ if(!id) return Promise.resolve(); return DB.u('users/'+id,d); },
   saveUser: function(u){ if(!_db) return Promise.resolve(); var c=Object.assign({},u); delete c.videoData; return _db.ref('users/'+u.id).set(c); },
@@ -1503,7 +1504,7 @@ var Admin = {
       var a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv.join('\n'));a.download='taskmint_users_'+new Date().toISOString().slice(0,10)+'.csv';a.click();T('Exported!','success');
     }catch(e){T('Export failed','error');}
   },
-  reset: async function(){if(!confirm('DELETE ALL DATA?'))return;if(prompt('Type RESET:')!=='RESET')return;await Promise.all([DB.w('users',null),DB.w('withdrawals',null),DB.w('videos',null),DB.w('tasks',null),DB.w('comments',null)]);T('All data cleared!','info');setTimeout(function(){location.reload();},2000);}
+  reset: function(){ T('Data reset is disabled for safety. Contact developer.','warning'); }
 };
 
 /* ================================================================
