@@ -761,12 +761,14 @@ var VidSys = {
     var video=_allVids.find(function(v){return v.id===videoId;});
     if(!video){try{_allVids=await DB.vids();video=_allVids.find(function(v){return v.id===videoId;});}catch(e){}}
     if(!video) return T('Video not found','error');
-    /* Ad logic */
-    _adPlays++;
-    if(_cfg.videoAdEnabled&&_cfg.videoAdCode&&(_adPlays%(_cfg.adFrequency||1)===0)){
-      AdSys.play(_cfg.videoAdCode,_cfg.adSkipTime||5,_cfg.adUnskippable||false,video);
+    /* YouTube-style: show ad only ONCE per video per session */
+    var adKey = 'ad_seen_' + videoId;
+    var alreadySeenAd = sessionStorage.getItem(adKey);
+    if(_cfg.videoAdEnabled && _cfg.videoAdCode && !alreadySeenAd){
+      sessionStorage.setItem(adKey, '1');
+      AdSys.play(video);
     } else {
-      VidSys._startPlayer(video,u);
+      VidSys._startPlayer(video, u);
     }
   },
   close: function(){
@@ -1029,29 +1031,147 @@ var VidSys = {
 /* ================================================================
    AD SYSTEM
    ================================================================ */
+/* ================================================================
+   AD SYSTEM — YouTube Style
+   Rules:
+   - Ad shown only ONCE per video per session
+   - Skip button appears after N seconds (default 5s)
+   - Bumper ads (≤6s) cannot be skipped
+   - User earns +2 coins for watching full ad
+   - Ad progress bar at bottom like YouTube
+   ================================================================ */
 var AdSys = {
   _pendVideo: null,
-  play: function(code,skip,unskip,video){
-    AdSys._pendVideo=video;
-    var ov=document.getElementById('adOverlay'),inner=document.getElementById('adInner');
-    if(!ov||!inner){VidSys._startPlayer(video,S.me());return;}
-    inner.innerHTML='';
-    var w=document.createElement('div');w.innerHTML=code;inner.appendChild(w);
-    w.querySelectorAll('script').forEach(function(o){var n=document.createElement('script');Array.from(o.attributes).forEach(function(a){n.setAttribute(a.name,a.value);});n.textContent=o.textContent;o.parentNode.replaceChild(n,o);});
+  _t: null,
+  _coinGiven: false,
+
+  play: function(video) {
+    AdSys._pendVideo = video;
+    AdSys._coinGiven = false;
+    var code    = _cfg.videoAdCode || '';
+    var skip    = _cfg.adSkipTime  || 5;
+    var unskip  = _cfg.adUnskippable || false;
+    var type    = _cfg.adType || 'preroll'; /* preroll / bumper */
+
+    var ov    = document.getElementById('adOverlay');
+    var inner = document.getElementById('adInner');
+    if (!ov || !inner || !code) { VidSys._startPlayer(video, S.me()); return; }
+
+    /* Inject ad content */
+    inner.innerHTML = '';
+    var wrap = document.createElement('div');
+    wrap.innerHTML = code;
+    inner.appendChild(wrap);
+    wrap.querySelectorAll('script').forEach(function(o) {
+      var n = document.createElement('script');
+      Array.from(o.attributes).forEach(function(a){ n.setAttribute(a.name, a.value); });
+      n.textContent = o.textContent;
+      o.parentNode.replaceChild(n, o);
+    });
+
+    /* Show overlay */
     ov.classList.remove('hidden');
-    var sb=document.getElementById('adSkipBtn'),fill=document.getElementById('adFill'),txt=document.getElementById('adTxt');
-    if(unskip&&sb)sb.classList.add('hidden'); else if(sb){sb.classList.add('hidden');}
-    var left=skip; if(txt)txt.textContent=left+'s'; if(fill)fill.style.width='100%';
+
+    /* UI elements */
+    var sb       = document.getElementById('adSkipBtn');
+    var skipTxt  = document.getElementById('adSkipTxt');
+    var skipIcon = document.getElementById('adSkipIcon');
+    var fill     = document.getElementById('adFill');
+    var txt      = document.getElementById('adTxt');
+    var countdown= document.getElementById('adCountdown');
+    var coinBadge= document.getElementById('adCoinBadge');
+
+    /* Bumper = unskippable 6s */
+    var isBumper = (type === 'bumper' || skip <= 6);
+    var total    = isBumper ? Math.min(skip, 6) : skip;
+
+    /* Reset skip button — locked initially */
+    if (sb) {
+      sb.className = 'ad-skip-btn locked';
+      sb.style.display = 'flex';
+    }
+    if (skipTxt) skipTxt.style.display = 'inline';
+    if (skipIcon) skipIcon.style.display = 'none';
+    if (fill) fill.style.width = '100%';
+
+    /* Show coin badge */
+    if (coinBadge) coinBadge.style.display = 'flex';
+
+    /* Countdown */
+    var left = total;
+    if (txt) txt.textContent = left;
+    if (countdown) countdown.textContent = left + 's';
+
     clearInterval(AdSys._t);
-    AdSys._t=setInterval(function(){left--;if(txt)txt.textContent=left+'s';if(fill)fill.style.width=((left/skip)*100)+'%';if(left<=0){clearInterval(AdSys._t);if(!unskip&&sb)sb.classList.remove('hidden');else if(unskip)AdSys.skip();}},1000);
-    /* Coin reward for watching */
-    setTimeout(function(){try{var u=S.me();if(u&&_me){DB.getUser(u.id).then(function(ud){if(ud){DB.uu(u.id,{coins:(ud.coins||0)+2});_me=Object.assign({},_me,{coins:(_me.coins||0)+2});S.set(_me);UI.sync();}}).catch(function(){});}T('+2 coins for watching ad! 🪙','success');}catch(e){}},1000);
+    AdSys._t = setInterval(function() {
+      left--;
+      var pct = Math.max(0, (left / total) * 100);
+      if (fill) fill.style.width = pct + '%';
+      if (txt) txt.textContent = left;
+      if (countdown) countdown.textContent = left + 's';
+
+      /* Give coins when user has watched at least half */
+      if (!AdSys._coinGiven && left <= Math.floor(total / 2)) {
+        AdSys._coinGiven = true;
+        AdSys._giveCoins();
+      }
+
+      if (left <= 0) {
+        clearInterval(AdSys._t);
+        if (isBumper || unskip) {
+          /* Auto-skip after time */
+          AdSys.skip();
+        } else {
+          /* Show skip button */
+          if (sb) {
+            sb.className = 'ad-skip-btn';
+            if (skipTxt) skipTxt.style.display = 'none';
+            if (skipIcon) skipIcon.style.display = 'inline';
+          }
+        }
+        return;
+      }
+
+      /* After skip time — unlock skip button */
+      if (!isBumper && !unskip && left <= (total - skip)) {
+        if (sb) {
+          sb.className = 'ad-skip-btn';
+          if (skipTxt) skipTxt.style.display = 'none';
+          if (skipIcon) skipIcon.style.display = 'inline';
+        }
+      }
+    }, 1000);
   },
-  skip: function(){
+
+  skip: function() {
     clearInterval(AdSys._t);
-    var ov=document.getElementById('adOverlay');if(ov)ov.classList.add('hidden');
-    var inner=document.getElementById('adInner');if(inner)inner.innerHTML='';
-    if(AdSys._pendVideo){VidSys._startPlayer(AdSys._pendVideo,S.me());AdSys._pendVideo=null;}
+    /* Give coins if not yet given */
+    if (!AdSys._coinGiven) {
+      AdSys._coinGiven = true;
+      AdSys._giveCoins();
+    }
+    var ov = document.getElementById('adOverlay');
+    if (ov) ov.classList.add('hidden');
+    var inner = document.getElementById('adInner');
+    if (inner) inner.innerHTML = '';
+    if (AdSys._pendVideo) {
+      VidSys._startPlayer(AdSys._pendVideo, S.me());
+      AdSys._pendVideo = null;
+    }
+  },
+
+  _giveCoins: function() {
+    try {
+      var u = S.me(); if (!u || !_me) return;
+      DB.getUser(u.id).then(function(ud) {
+        if (!ud) return;
+        var reward = 2;
+        DB.uu(u.id, { coins: (ud.coins||0) + reward });
+        _me = Object.assign({}, _me, { coins: (_me.coins||0) + reward });
+        S.set(_me); UI.sync();
+        T('+2 coins for watching ad! 🪙', 'success');
+      }).catch(function(){});
+    } catch(e) {}
   }
 };
 

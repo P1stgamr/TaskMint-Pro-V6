@@ -771,21 +771,40 @@
 </div>
 
 <!-- ========== AD OVERLAY ========== -->
+<!-- ========== AD OVERLAY — YouTube Style ========== -->
 <div id="adOverlay" class="hidden" style="position:fixed;inset:0;background:#000;z-index:4000;display:flex;flex-direction:column;">
-  <div class="ad-content">
-    <div id="adInner"></div>
-    <div class="ad-coin-badge" id="adCoinBadge" style="display:none"><i class="fas fa-coins"></i> +<span id="adCoinAmt">2</span> coins</div>
-    <button class="ad-skip-btn locked" id="adSkipBtn" onclick="AdSys.skip()">
-      <span id="adSkipTxt">Ad ends in <span id="adTxt">5</span>s</span>
-      <i class="fas fa-forward" id="adSkipIcon" style="display:none"></i>
+
+  <!-- Ad video/banner area -->
+  <div style="flex:1;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;min-height:200px;background:#111">
+    <div id="adInner" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center"></div>
+
+    <!-- "Ad" label top-left like YouTube -->
+    <div style="position:absolute;top:10px;left:12px;background:rgba(0,0,0,.75);color:#aaa;font-size:.72rem;padding:3px 8px;border-radius:4px;letter-spacing:.5px">Ad</div>
+
+    <!-- Coin reward badge top-right -->
+    <div id="adCoinBadge" style="display:none;position:absolute;top:10px;right:12px;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#000;font-size:.75rem;font-weight:700;padding:4px 10px;border-radius:20px;align-items:center;gap:5px">
+      <i class="fas fa-coins"></i> Watch for +2 coins
+    </div>
+
+    <!-- Skip button — bottom right like YouTube -->
+    <button class="ad-skip-btn locked" id="adSkipBtn" onclick="AdSys.skip()" style="position:absolute;bottom:14px;right:14px">
+      <span id="adSkipTxt">Skip in <span id="adTxt">5</span>s</span>
+      <span id="adSkipIcon" style="display:none"><i class="fas fa-forward"></i> Skip Ad</span>
     </button>
   </div>
-  <div class="ad-ctrl">
+
+  <!-- Bottom control bar like YouTube -->
+  <div class="ad-ctrl" style="background:rgba(0,0,0,.9);padding:10px 14px;display:flex;align-items:center;gap:12px">
     <div style="flex:1">
-      <div style="font-size:.72rem;color:#888;margin-bottom:4px">Advertisement — Video continues after ad</div>
-      <div class="ad-bar"><div id="adFill" style="height:100%;transition:width 1s linear"></div></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+        <span style="font-size:.72rem;color:#888">Advertisement · Video will continue after this ad</span>
+        <span id="adCountdown" style="color:white;font-size:.82rem;font-weight:700">5s</span>
+      </div>
+      <!-- Yellow progress bar like YouTube -->
+      <div style="height:3px;background:rgba(255,255,255,.2);border-radius:2px;overflow:hidden">
+        <div id="adFill" style="height:100%;background:#fbbf24;transition:width 1s linear;width:100%"></div>
+      </div>
     </div>
-    <span id="adCountdown" style="color:white;font-size:.85rem;font-weight:700;min-width:28px;text-align:right">5s</span>
   </div>
 </div>
 
